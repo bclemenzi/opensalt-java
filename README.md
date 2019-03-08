@@ -22,9 +22,9 @@ The easiest way to incorporate the library into your Java project is to use Mave
 
 ```xml
 <dependency>
-  <groupId>com.nfbsoftware</groupId>
-	<artifactId>opensalt-java</artifactId>
-	<version>1.0.0</version>
+   <groupId>com.nfbsoftware</groupId>
+   <artifactId>opensalt-java</artifactId>
+   <version>1.0.0</version>
 </dependency>
 ```
 Usage
@@ -34,10 +34,11 @@ Below you will find a number of basic examples to guide you through the use of t
 **Basic Client Option**
 
 ```java
+// Set the location of our CASE server
 String hostDomain = "opensalt.net";
 String hostScheme = "https";
 int hostPort = 443;
 
-// Init our client object
+// Init our client object with the host information
 OpenSALTClient openSaltClient = new OpenSALTClient(hostDomain, hostPort, hostScheme);
 ```
