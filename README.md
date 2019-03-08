@@ -10,7 +10,7 @@ A simplified Java library for working with the Competencies and Academic Standar
 Features
 --------
 
-  * Supports IMS Global CASE v1.0
+  * Follows the IMS Global CASE v1.0 OpenAPI
   * Fully constructed and inflated document trees
   * Published on Maven Central Repository
 
