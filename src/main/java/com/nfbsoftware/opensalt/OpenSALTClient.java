@@ -137,6 +137,12 @@ public class OpenSALTClient
         return cfDocumentList;
     }
     
+    /**
+     * 
+     * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
+     * @return
+     * @throws Exception
+     */
     public CFDocument getCFDocument(String sourceId) throws Exception
     {
         CFDocument cfDocument = null;

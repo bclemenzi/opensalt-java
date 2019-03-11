@@ -133,12 +133,15 @@ public class OpenSALTClientTest extends TestCase
             
             CFDocument tmpCFDocument = client.getCFDocument("c5fb0812-d7cb-11e8-824f-0242ac160002");
             
-            System.out.println("Identifier: " + tmpCFDocument.getIdentifier());
-            System.out.println("Title: " + tmpCFDocument.getTitle());
-            System.out.println("Description: " + tmpCFDocument.getDescription());
-            System.out.println("Notes: " + tmpCFDocument.getNotes());
-            System.out.println("Creator: " + tmpCFDocument.getCreator());
-            System.out.println("Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+            if(tmpCFDocument != null)
+            {
+                System.out.println("Identifier: " + tmpCFDocument.getIdentifier());
+                System.out.println("Title: " + tmpCFDocument.getTitle());
+                System.out.println("Description: " + tmpCFDocument.getDescription());
+                System.out.println("Notes: " + tmpCFDocument.getNotes());
+                System.out.println("Creator: " + tmpCFDocument.getCreator());
+                System.out.println("Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+            }
             
             assertTrue(true);
         }

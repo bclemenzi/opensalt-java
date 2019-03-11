@@ -24,7 +24,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.0</version>
+   <version>1.0.1</version>
 </dependency>
 ```
 Usage
@@ -41,4 +41,68 @@ int hostPort = 443;
 
 // Init our client object with the host information
 OpenSALTClient openSaltClient = new OpenSALTClient(hostDomain, hostPort, hostScheme);
+```
+Library Functions
+-----
+The current set of functions were designed to allow a developer to mimic the functionality of the search system found online: [OpenSALT.net](https://opensalt.net/api/doc)
+
+**List all of the CFDocuments available**
+
+```java	
+// Get a list of all the documents
+List<CFDocument> documentList = client.getAllCFDocuments();
+
+// Loop through the returned documents
+int counter = 1;
+for(CFDocument tmpCFDocument : documentList)
+{
+    System.out.println("[Doc " + counter + "] Identifier: " + tmpCFDocument.getIdentifier());
+    System.out.println("[Doc " + counter + "] Title: " + tmpCFDocument.getTitle());
+    System.out.println("[Doc " + counter + "] Description: " + tmpCFDocument.getDescription());
+    System.out.println("[Doc " + counter + "] Notes: " + tmpCFDocument.getNotes());
+    System.out.println("[Doc " + counter + "] Creator: " + tmpCFDocument.getCreator());
+    System.out.println("[Doc " + counter + "] Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+    System.out.println("");
+    
+    counter++;
+}
+```
+
+**List the CFDocuments available by page**
+
+```java	
+// Get a paged list (first 25 documents) of documents sorted by title
+List<CFDocument> documentList = client.getCFDocuments(25, 0, "title", "desc");
+
+// Loop through the returned documents
+int counter = 1;
+for(CFDocument tmpCFDocument : documentList)
+{
+    System.out.println("[Doc " + counter + "] Identifier: " + tmpCFDocument.getIdentifier());
+    System.out.println("[Doc " + counter + "] Title: " + tmpCFDocument.getTitle());
+    System.out.println("[Doc " + counter + "] Description: " + tmpCFDocument.getDescription());
+    System.out.println("[Doc " + counter + "] Notes: " + tmpCFDocument.getNotes());
+    System.out.println("[Doc " + counter + "] Creator: " + tmpCFDocument.getCreator());
+    System.out.println("[Doc " + counter + "] Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+    System.out.println("");
+    
+    counter++;
+}
+```
+
+**Get a single CFDocument**
+
+```java	
+// Get a single document by it's identifier
+CFDocument tmpCFDocument = client.getCFDocument("c5fb0812-d7cb-11e8-824f-0242ac160002");
+
+if(tmpCFDocument != null)
+{
+    System.out.println("Identifier: " + tmpCFDocument.getIdentifier());
+    System.out.println("Title: " + tmpCFDocument.getTitle());
+    System.out.println("Description: " + tmpCFDocument.getDescription());
+    System.out.println("Notes: " + tmpCFDocument.getNotes());
+    System.out.println("Creator: " + tmpCFDocument.getCreator());
+    System.out.println("Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+}
 ```
