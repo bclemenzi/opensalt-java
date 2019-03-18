@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "identifier", "uri", "creator", "title", "lastChangeDateTime", "officialSourceURL", "publisher", "description", "subject",
-        "subjectURI", "language", "version", "adoptionStatus", "statusStartDate", "statusEndDate", "licenseURI", "notes", "CFPackageURI" })
+        "subjectURI", "language", "version", "adoptionStatus", "statusStartDate", "statusEndDate", "licenseURI", "notes", "CFPackageURI", "CFItems" })
 public class CFDocument implements Serializable
 {
     private final static long serialVersionUID = -5251396790181393665L;
@@ -74,6 +74,9 @@ public class CFDocument implements Serializable
 
     @JsonProperty("subjectURI")
     private List<SubjectURus> subjectURI = null;
+    
+    @JsonProperty("CFItems")
+    private List<CFItem> cFItems = null;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -196,6 +199,16 @@ public class CFDocument implements Serializable
     public void setSubjectURI(List<SubjectURus> subjectURI)
     {
         this.subjectURI = subjectURI;
+    }
+
+    @JsonProperty("CFItems")
+    public List<CFItem> getCFItems() {
+        return cFItems;
+    }
+
+    @JsonProperty("CFItems")
+    public void setCFItems(List<CFItem> cFItems) {
+        this.cFItems = cFItems;
     }
 
     @JsonProperty("language")

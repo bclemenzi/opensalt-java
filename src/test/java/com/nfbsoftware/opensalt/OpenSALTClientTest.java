@@ -1,8 +1,14 @@
 package com.nfbsoftware.opensalt;
 
+import java.util.Date;
 import java.util.List;
 
+import com.nfbsoftware.opensalt.model.CFAssociation;
 import com.nfbsoftware.opensalt.model.CFDocument;
+import com.nfbsoftware.opensalt.model.CFItem;
+import com.nfbsoftware.opensalt.model.DestinationNodeURI;
+import com.nfbsoftware.opensalt.model.OriginNodeURI;
+import com.nfbsoftware.standards.model.Standard;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -66,7 +72,7 @@ public class OpenSALTClientTest extends TestCase
                 counter++;
             }
             
-            assertTrue(true);
+            assertTrue(documentList.size() > 0);
         }
         catch (Exception e)
         {
@@ -90,7 +96,7 @@ public class OpenSALTClientTest extends TestCase
         {
             OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
             
-            List<CFDocument> documentList = client.getCFDocuments(1, 0, "title", "desc");
+            List<CFDocument> documentList = client.getCFDocuments(100, 0, "title", "desc");
             
             int counter = 1;
             
@@ -107,7 +113,7 @@ public class OpenSALTClientTest extends TestCase
                 counter++;
             }
             
-            assertTrue(true);
+            assertTrue(documentList.size() > 0);
         }
         catch (Exception e)
         {
@@ -143,7 +149,7 @@ public class OpenSALTClientTest extends TestCase
                 System.out.println("Adoption Status: " + tmpCFDocument.getAdoptionStatus());
             }
             
-            assertTrue(true);
+            assertTrue(tmpCFDocument != null);
         }
         catch (Exception e)
         {
@@ -153,5 +159,114 @@ public class OpenSALTClientTest extends TestCase
         }
         
         System.out.println("====> Finished OpenSALTClientTest.testGetCFDocument");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testGetCFPackages() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testGetCFPackages");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            List<CFItem> cfItems = client.getCFPackages("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            
+            for(CFItem tmpCFItem : cfItems)
+            {
+                if(tmpCFItem.getCFItemType() == null)
+                {
+                    System.out.println("Identifier: " + tmpCFItem.getIdentifier() + " [" + tmpCFItem.getCFItemType() + "] " + tmpCFItem.getFullStatement());
+                }
+            }
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testGetCFPackage");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testGetCFItemAssociations() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testGetCFItemAssociations");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            List<CFAssociation> tmpAssociations = client.getCFItemAssociations("18eff32c-d7cc-11e8-824f-0242ac160002");
+            
+            for(CFAssociation tmpCFAssociation : tmpAssociations)
+            {
+                if(tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+                {
+                    OriginNodeURI tmpOriginNodeURI = tmpCFAssociation.getOriginNodeURI();
+                    
+                    if(tmpOriginNodeURI != null)
+                    {
+                        System.out.println("Identifier: " + tmpOriginNodeURI.getIdentifier() + " - " + tmpOriginNodeURI.getTitle());
+                    }
+                }
+                
+            }
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testGetCFItemAssociations");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testBuildHierarchicalJSON() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testBuildHierarchicalJSON");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            System.out.println((new Date()).getTime());
+            
+            Standard fullStandardsDocument = client.getFullHierarchicalStandard("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            
+            if(fullStandardsDocument != null)
+            {
+                System.out.println(fullStandardsDocument.getDocumentTitle());
+            }
+            
+            System.out.println((new Date()).getTime());
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testBuildHierarchicalJSON");
     }
 }

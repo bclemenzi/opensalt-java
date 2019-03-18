@@ -14,32 +14,28 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "title",
     "identifier",
-    "uri"
+    "uri",
+    "title",
+    "description",
+    "lastChangeDateTime"
 })
-public class SubjectURus implements Serializable
+public class CFAssociationGrouping implements Serializable
 {
 
-    @JsonProperty("title")
-    private String title;
     @JsonProperty("identifier")
     private String identifier;
     @JsonProperty("uri")
     private String uri;
+    @JsonProperty("title")
+    private String title;
+    @JsonProperty("description")
+    private String description;
+    @JsonProperty("lastChangeDateTime")
+    private String lastChangeDateTime;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = -6268780525652992280L;
-
-    @JsonProperty("title")
-    public String getTitle() {
-        return title;
-    }
-
-    @JsonProperty("title")
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    private final static long serialVersionUID = 9024735286525835525L;
 
     @JsonProperty("identifier")
     public String getIdentifier() {
@@ -61,6 +57,36 @@ public class SubjectURus implements Serializable
         this.uri = uri;
     }
 
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @JsonProperty("lastChangeDateTime")
+    public String getLastChangeDateTime() {
+        return lastChangeDateTime;
+    }
+
+    @JsonProperty("lastChangeDateTime")
+    public void setLastChangeDateTime(String lastChangeDateTime) {
+        this.lastChangeDateTime = lastChangeDateTime;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -73,7 +99,7 @@ public class SubjectURus implements Serializable
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("title", title).append("identifier", identifier).append("uri", uri).append("additionalProperties", additionalProperties).toString();
+        return new ToStringBuilder(this).append("identifier", identifier).append("uri", uri).append("title", title).append("description", description).append("lastChangeDateTime", lastChangeDateTime).append("additionalProperties", additionalProperties).toString();
     }
 
 }

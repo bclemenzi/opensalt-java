@@ -18,7 +18,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "identifier",
     "uri"
 })
-public class SubjectURus implements Serializable
+public class CFAssociationGroupingURI implements Serializable
 {
 
     @JsonProperty("title")
@@ -29,7 +29,7 @@ public class SubjectURus implements Serializable
     private String uri;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = -6268780525652992280L;
+    private final static long serialVersionUID = -501031772850980229L;
 
     @JsonProperty("title")
     public String getTitle() {

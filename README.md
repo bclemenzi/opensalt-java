@@ -24,7 +24,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.1</version>
+   <version>1.0.2</version>
 </dependency>
 ```
 Usage
@@ -104,5 +104,44 @@ if(tmpCFDocument != null)
     System.out.println("Notes: " + tmpCFDocument.getNotes());
     System.out.println("Creator: " + tmpCFDocument.getCreator());
     System.out.println("Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+}
+```
+
+**Get an entire framework package**
+
+```java	
+// Get an entire framework package
+List<CFItem> cfItems = client.getCFPackages("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            
+for(CFItem tmpCFItem : cfItems)
+{
+    if(tmpCFItem.getCFItemType() == null)
+    {
+        System.out.println("Identifier: " + tmpCFItem.getIdentifier() + " [" + tmpCFItem.getCFItemType() + "] " + tmpCFItem.getFullStatement());
+    }
+}
+```
+
+**Get all item associations**
+
+```java	
+// Get all the associations for a given item
+List<CFAssociation> tmpAssociations = client.getCFItemAssociations("18eff32c-d7cc-11e8-824f-0242ac160002");
+
+for(CFAssociation tmpCFAssociation : tmpAssociations)
+{
+    System.out.println("Identifier: " + tmpCFAssociation.getIdentifier());
+}
+```
+
+**Get a full hierarchical standard document.  It is recommended that you cache the results as this call can take a long time.**
+
+```java	
+// Get a full hierarchical standard document
+Standard fullStandardsDocument = client.getFullHierarchicalStandard("c5fb0812-d7cb-11e8-824f-0242ac160002");
+
+if(fullStandardsDocument != null)
+{
+    System.out.println(fullStandardsDocument.getDocumentTitle());
 }
 ```

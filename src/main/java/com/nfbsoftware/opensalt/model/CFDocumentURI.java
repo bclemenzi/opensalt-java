@@ -14,32 +14,22 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "title",
     "identifier",
+    "title",
     "uri"
 })
-public class SubjectURus implements Serializable
+public class CFDocumentURI implements Serializable
 {
 
-    @JsonProperty("title")
-    private String title;
     @JsonProperty("identifier")
     private String identifier;
+    @JsonProperty("title")
+    private String title;
     @JsonProperty("uri")
     private String uri;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = -6268780525652992280L;
-
-    @JsonProperty("title")
-    public String getTitle() {
-        return title;
-    }
-
-    @JsonProperty("title")
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    private final static long serialVersionUID = 7953750542960428149L;
 
     @JsonProperty("identifier")
     public String getIdentifier() {
@@ -49,6 +39,16 @@ public class SubjectURus implements Serializable
     @JsonProperty("identifier")
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @JsonProperty("uri")
@@ -73,7 +73,7 @@ public class SubjectURus implements Serializable
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("title", title).append("identifier", identifier).append("uri", uri).append("additionalProperties", additionalProperties).toString();
+        return new ToStringBuilder(this).append("identifier", identifier).append("title", title).append("uri", uri).append("additionalProperties", additionalProperties).toString();
     }
 
 }
