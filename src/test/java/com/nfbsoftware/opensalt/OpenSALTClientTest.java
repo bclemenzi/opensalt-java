@@ -249,7 +249,7 @@ public class OpenSALTClientTest extends TestCase
             
             System.out.println((new Date()).getTime());
             
-            Standard fullStandardsDocument = client.getFullHierarchicalStandard("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("c5fb0812-d7cb-11e8-824f-0242ac160002");
             
             if(fullStandardsDocument != null)
             {

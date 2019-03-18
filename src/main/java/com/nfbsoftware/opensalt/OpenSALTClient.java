@@ -55,10 +55,10 @@ public class OpenSALTClient
     }
     
     /**
-     * <p>This is a request to the Service Provider to provide all of the Competency Framework Documents./p>
+     * <p>This is a request to the Service Provider to provide all of the Competency Framework Documents.</p>
      * 
      * @return A set of CFDocument objects
-     * @throws Exception
+     * @throws Exception - catch all for exceptions
      */
     public List<CFDocument> getAllCFDocuments() throws Exception
     {
@@ -96,14 +96,14 @@ public class OpenSALTClient
     }
     
     /**
-     * <p>This is a request to the Service Provider to provide all of the Competency Framework Documents./p>
+     * <p>This is a request to the Service Provider to provide all of the Competency Framework Documents.</p>
      * 
      * @param limit The 'limit' defines the download segmentation value i.e. the maximum number of records to be contained in the response.
      * @param offset The 'offset' is the number of the first record to be supplied in the segmented response message.
      * @param sort The 'sort' identifies the sort criteria to be used for the records in the response message.
      * @param orderBy This is used as part of the sorting mechanism to be use by the service provider.
-     * @return
-     * @throws Exception
+     * @return A set of CFDocument objects
+     * @throws Exception - catch all for exceptions
      */
     public List<CFDocument> getCFDocuments(int limit, int offset, String sort, String orderBy) throws Exception
     {
@@ -151,8 +151,8 @@ public class OpenSALTClient
      * <p>This is a request to the service provider to provide the information for the specific Competency Framework Document.</p>
      * 
      * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
-     * @return
-     * @throws Exception
+     * @return sourceId - A single CFDocument object
+     * @throws Exception - catch all for exceptions
      */
     public CFDocument getCFDocument(String sourceId) throws Exception
     {
@@ -191,8 +191,8 @@ public class OpenSALTClient
      * <p>This is a request to the service provider to provide the information for the specific Competency Framework Package.</p>
      * 
      * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
-     * @return
-     * @throws Exception
+     * @return sourceId - A set of CFItem objects
+     * @throws Exception - catch all for exceptions
      */
     public List<CFItem> getCFPackages(String sourceId) throws Exception
     {
@@ -233,8 +233,8 @@ public class OpenSALTClient
      * <p>This is a request to the Service Provider to provide the all of the Competency Associations for the specified CFItem.</p>
      * 
      * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
-     * @return
-     * @throws Exception
+     * @return sourceId - A set of CFAssociation objects
+     * @throws Exception - catch all for exceptions
      */
     public List<CFAssociation> getCFItemAssociations(String sourceId) throws Exception
     {
@@ -274,8 +274,9 @@ public class OpenSALTClient
     /**
      * <p>=Returns a full hierarchical representation of the standards document</p>
      * 
-     * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
-     * @return
+     * @param documentSourceId - The GUID that identifies the Competency Framework Document that is to be read from the service provider.
+     * @return A full hierarchical set of standards objects
+     * @throws Exception - catch all for exceptions
      */
     public Standard getFullHierarchicalStandard(String documentSourceId) throws Exception
     {
