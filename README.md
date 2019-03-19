@@ -24,7 +24,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.2</version>
+   <version>1.0.3</version>
 </dependency>
 ```
 Usage
@@ -119,6 +119,21 @@ for(CFItem tmpCFItem : cfItems)
     {
         System.out.println("Identifier: " + tmpCFItem.getIdentifier() + " [" + tmpCFItem.getCFItemType() + "] " + tmpCFItem.getFullStatement());
     }
+}
+```
+
+**Get an single item**
+
+```java	
+// Get an single item
+CFItem tmpCFItem = client.getCFItem("5ad1a3fe-f280-11e8-9cff-0242ac140002");
+
+if(tmpCFItem != null)
+{
+    System.out.println("Identifier: " + tmpCFItem.getIdentifier());
+    System.out.println("HumanCodingScheme: " + tmpCFItem.getHumanCodingScheme());
+    System.out.println("FullStatement: " + tmpCFItem.getFullStatement());
+    System.out.println("Notes: " + tmpCFItem.getNotes());
 }
 ```
 

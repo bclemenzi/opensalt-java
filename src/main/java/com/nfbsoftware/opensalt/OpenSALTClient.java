@@ -230,6 +230,46 @@ public class OpenSALTClient
     }
     
     /**
+     * <p>This is a request to the Service Provider to provide the specified Competency Framework Item.</p>
+     * 
+     * @param sourceId The GUID that identifies the Competency Framework Item that is to be read from the service provider.
+     * @return sourceId - A single CFDocument object
+     * @throws Exception - catch all for exceptions
+     */
+    public CFItem getCFItem(String sourceId) throws Exception
+    {
+        CFItem cfItem = null;
+        
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        
+        // specify the host, protocol, and port
+        HttpHost target = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
+        
+        logger.debug("Getting CFDocument " + sourceId);
+        
+        // specify the get request
+        HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFItems/" + sourceId);
+
+        // Get our response from the SALT server
+        HttpResponse saltyResponse = httpClient.execute(target, getRequest);
+        HttpEntity entity = saltyResponse.getEntity();
+        
+        // If we have an entity, convert it to Java objects
+        if(entity != null) 
+        {
+            String responseString = EntityUtils.toString(entity);   
+            
+            JSONObject responseJSON = new JSONObject(responseString);
+            //System.out.println(responseJSON.toString());
+            
+            ObjectMapper mapper = new ObjectMapper();
+            cfItem = mapper.readValue(responseJSON.toString(),  CFItem.class);
+        }
+        
+        return cfItem;
+    }
+    
+    /**
      * <p>This is a request to the Service Provider to provide the all of the Competency Associations for the specified CFItem.</p>
      * 
      * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.

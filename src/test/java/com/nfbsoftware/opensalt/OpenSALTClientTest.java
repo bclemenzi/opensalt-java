@@ -3,10 +3,10 @@ package com.nfbsoftware.opensalt;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfbsoftware.opensalt.model.CFAssociation;
 import com.nfbsoftware.opensalt.model.CFDocument;
 import com.nfbsoftware.opensalt.model.CFItem;
-import com.nfbsoftware.opensalt.model.DestinationNodeURI;
 import com.nfbsoftware.opensalt.model.OriginNodeURI;
 import com.nfbsoftware.standards.model.Standard;
 
@@ -199,6 +199,40 @@ public class OpenSALTClientTest extends TestCase
      * 
      * @throws Exception
      */
+    public void testGetCFItem() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testGetCFItem");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            CFItem tmpCFItem = client.getCFItem("5ad1a3fe-f280-11e8-9cff-0242ac140002");
+            
+            if(tmpCFItem != null)
+            {
+                System.out.println("Identifier: " + tmpCFItem.getIdentifier());
+                System.out.println("HumanCodingScheme: " + tmpCFItem.getHumanCodingScheme());
+                System.out.println("FullStatement: " + tmpCFItem.getFullStatement());
+                System.out.println("Notes: " + tmpCFItem.getNotes());
+            }
+            
+            assertTrue(tmpCFItem != null);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testGetCFItem");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
     public void testGetCFItemAssociations() throws Exception
     {
         System.out.println("====> Starting OpenSALTClientTest.testGetCFItemAssociations");
@@ -249,11 +283,16 @@ public class OpenSALTClientTest extends TestCase
             
             System.out.println((new Date()).getTime());
             
-            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("4d6d406e-f280-11e8-9cff-0242ac140002");
             
             if(fullStandardsDocument != null)
             {
                 System.out.println(fullStandardsDocument.getDocumentTitle());
+                
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(fullStandardsDocument);
+                
+                System.out.println(jsonInString);
             }
             
             System.out.println((new Date()).getTime());
