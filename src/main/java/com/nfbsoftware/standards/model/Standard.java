@@ -29,6 +29,8 @@ public class Standard implements Serializable
     private String m_creator;
     private String m_language;
     private String m_adoptionStatus;
+    
+    private int m_usageCount = 1;
 
     private List<Standard> m_standards = new ArrayList<Standard>();
 
@@ -147,6 +149,15 @@ public class Standard implements Serializable
     public void setAdoptionStatus(String adoptionStatus)
     {
         m_adoptionStatus = adoptionStatus;
+    }
+    
+    public int getUsageCount()
+    {
+        return m_usageCount;
+    }
+    public void setUsageCount(int usageCount)
+    {
+        m_usageCount = usageCount;
     }
     
     public List<Standard> getStandards()
