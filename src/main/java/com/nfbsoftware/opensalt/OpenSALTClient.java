@@ -314,7 +314,7 @@ public class OpenSALTClient
     /**
      * <p>=Returns a full hierarchical representation of the standards document</p>
      * 
-     * @param documentSourceId - The GUID that identifies the Competency Framework Document that is to be read from the service provider.
+     * @param sourceId - The GUID that either identifies the CFDocument identifier .OR. a CFItem identifier
      * @return A full hierarchical set of standards objects
      * @throws Exception - catch all for exceptions
      */
