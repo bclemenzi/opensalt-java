@@ -318,13 +318,13 @@ public class OpenSALTClient
      * @return A full hierarchical set of standards objects
      * @throws Exception - catch all for exceptions
      */
-    public Standard getFullHierarchicalStandard(String documentSourceId) throws Exception
+    public Standard getFullHierarchicalStandard(String sourceId) throws Exception
     {
         Standard standardDocument = null;
         
-        CFDocument tmpCFDocument = getCFDocument(documentSourceId);
+        CFDocument tmpCFDocument = getCFDocument(sourceId);
         
-        if(tmpCFDocument != null)
+        if(tmpCFDocument.getIdentifier() != null)
         {
             standardDocument = new Standard();
             standardDocument.setId(tmpCFDocument.getIdentifier());
@@ -340,7 +340,7 @@ public class OpenSALTClient
             Map<String, CFItem> cfItemsMap = new HashMap<String, CFItem>();
             
             // Get ALL the levels of the document and store them in the hash map
-            List<CFItem> cfItems = getCFPackages(documentSourceId);
+            List<CFItem> cfItems = getCFPackages(sourceId);
             for(CFItem tmpCFItem : cfItems)
             {
                 cfItemsMap.put(tmpCFItem.getIdentifier(), tmpCFItem);
@@ -386,6 +386,43 @@ public class OpenSALTClient
             
             // Add the top level 
             standardDocument.setStandards(topLevelStandards);
+        }
+        else
+        {
+            // Since we didn't find a framework document, check to see if the sourceId is a CFItem
+            CFItem tempCFItem = getCFItem(sourceId);
+            
+            if(tempCFItem != null)
+            {
+                // We have an item, so lets get it's parent document
+                tmpCFDocument = getCFDocument(tempCFItem.getCFDocumentURI().getIdentifier());
+                
+                // Set a hash map to store all the document elements
+                Map<String, CFItem> cfItemsMap = new HashMap<String, CFItem>();
+                
+                // Get ALL the levels of the document and store them in the hash map
+                List<CFItem> cfItems = getCFPackages(tmpCFDocument.getIdentifier());
+                for(CFItem tmpCFItem : cfItems)
+                {
+                    cfItemsMap.put(tmpCFItem.getIdentifier(), tmpCFItem);
+                }
+                
+                standardDocument = new Standard();
+                standardDocument.setId(tempCFItem.getIdentifier());
+                standardDocument.setDocumentId(tmpCFDocument.getIdentifier());
+                standardDocument.setDocumentTitle(StringUtils.stripToEmpty(tmpCFDocument.getTitle()));
+                standardDocument.setFullStatement(StringUtils.stripToEmpty(tempCFItem.getFullStatement()));
+                standardDocument.setNotes(StringUtils.stripToEmpty(tempCFItem.getNotes()));
+                standardDocument.setCreator(StringUtils.stripToEmpty(tmpCFDocument.getCreator()));
+                standardDocument.setAdoptionStatus(StringUtils.stripToEmpty(tmpCFDocument.getAdoptionStatus()));
+                standardDocument.setLanguage(StringUtils.stripToEmpty(tmpCFDocument.getLanguage()));
+                standardDocument.setHumanCodingScheme(StringUtils.stripToEmpty(tempCFItem.getHumanCodingScheme()));
+                standardDocument.setListEnumeration(StringUtils.stripToEmpty(tempCFItem.getListEnumeration()));
+                standardDocument.setType(StringUtils.stripToEmpty(tempCFItem.getCFItemType()));
+
+                // Get children of the item
+                getChildAssociations(standardDocument, cfItemsMap, standardDocument);
+            }
         }
         
         return standardDocument;

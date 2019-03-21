@@ -24,7 +24,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.5</version>
+   <version>1.0.6</version>
 </dependency>
 ```
 Usage
@@ -158,5 +158,17 @@ Standard fullStandardsDocument = client.getFullHierarchicalStandard("c5fb0812-d7
 if(fullStandardsDocument != null)
 {
     System.out.println(fullStandardsDocument.getDocumentTitle());
+}
+```
+
+**Get a partial hierarchical standard document starting from a child level.  It is recommended that you cache the results as this call can take a long time.**
+
+```java	
+// Get a partial hierarchical standard document by passing in a CFItem identifier
+Standard partialStandardsDocument = client.getFullHierarchicalStandard("5ad17357-f280-11e8-9cff-0242ac140002");
+
+if(partialStandardsDocument != null)
+{
+    System.out.println(partialStandardsDocument.getDocumentTitle());
 }
 ```

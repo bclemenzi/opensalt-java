@@ -308,4 +308,45 @@ public class OpenSALTClientTest extends TestCase
         
         System.out.println("====> Finished OpenSALTClientTest.testBuildHierarchicalJSON");
     }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testBuildHierarchicalJSONForCFItem() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testBuildHierarchicalJSONForCFItem");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            System.out.println((new Date()).getTime());
+            
+            // Pass in a CFItem ID to get the subset of the document
+            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("5ad17357-f280-11e8-9cff-0242ac140002");
+            
+            if(fullStandardsDocument != null)
+            {
+                System.out.println(fullStandardsDocument.getDocumentTitle());
+                
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(fullStandardsDocument);
+                
+                System.out.println(jsonInString);
+            }
+            
+            System.out.println((new Date()).getTime());
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testBuildHierarchicalJSONForCFItem");
+    }
 }
