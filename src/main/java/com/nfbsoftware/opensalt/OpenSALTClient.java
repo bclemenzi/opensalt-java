@@ -328,6 +328,7 @@ public class OpenSALTClient
         {
             standardDocument = new Standard();
             standardDocument.setId(tmpCFDocument.getIdentifier());
+            standardDocument.setDocumentId(tmpCFDocument.getIdentifier());
             standardDocument.setDocumentTitle(StringUtils.stripToEmpty(tmpCFDocument.getTitle()));
             standardDocument.setFullStatement(StringUtils.stripToEmpty(tmpCFDocument.getTitle()));
             standardDocument.setNotes(StringUtils.stripToEmpty(tmpCFDocument.getNotes()));
