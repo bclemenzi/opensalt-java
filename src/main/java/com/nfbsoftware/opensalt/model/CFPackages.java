@@ -19,9 +19,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class CFPackages implements Serializable
 {
-
     @JsonProperty("CFItems")
     private List<CFItem> cFItems = null;
+    @JsonProperty("CFAssociations")
+    private List<CFAssociation> cFAssociations = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private final static long serialVersionUID = 8230413264084869585L;
@@ -44,6 +45,16 @@ public class CFPackages implements Serializable
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+    
+    @JsonProperty("CFAssociations")
+    public List<CFAssociation> getCFAssociations() {
+        return cFAssociations;
+    }
+
+    @JsonProperty("CFAssociations")
+    public void setCFAssociations(List<CFAssociation> cFAssociations) {
+        this.cFAssociations = cFAssociations;
     }
 
     @Override

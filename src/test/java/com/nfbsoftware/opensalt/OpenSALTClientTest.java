@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfbsoftware.opensalt.model.CFAssociation;
 import com.nfbsoftware.opensalt.model.CFDocument;
 import com.nfbsoftware.opensalt.model.CFItem;
+import com.nfbsoftware.opensalt.model.CFPackages;
 import com.nfbsoftware.opensalt.model.OriginNodeURI;
 import com.nfbsoftware.standards.model.Standard;
 
@@ -173,7 +174,8 @@ public class OpenSALTClientTest extends TestCase
         {
             OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
             
-            List<CFItem> cfItems = client.getCFPackages("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            CFPackages cfPackages = client.getCFPackages("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            List<CFItem> cfItems = cfPackages.getCFItems();
             
             for(CFItem tmpCFItem : cfItems)
             {
@@ -283,7 +285,7 @@ public class OpenSALTClientTest extends TestCase
             
             System.out.println((new Date()).getTime());
             
-            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("4d6d406e-f280-11e8-9cff-0242ac140002");
+            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("4d6e94e4-f280-11e8-9cff-0242ac140002");
             
             if(fullStandardsDocument != null)
             {

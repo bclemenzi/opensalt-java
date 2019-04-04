@@ -23,6 +23,7 @@ import com.nfbsoftware.opensalt.model.CFDocument;
 import com.nfbsoftware.opensalt.model.CFItem;
 import com.nfbsoftware.opensalt.model.CFItemTypeURI;
 import com.nfbsoftware.opensalt.model.CFPackages;
+import com.nfbsoftware.opensalt.model.DestinationNodeURI;
 import com.nfbsoftware.opensalt.model.Documents;
 import com.nfbsoftware.opensalt.model.OriginNodeURI;
 import com.nfbsoftware.standards.model.Standard;
@@ -194,9 +195,9 @@ public class OpenSALTClient
      * @return sourceId - A set of CFItem objects
      * @throws Exception - catch all for exceptions
      */
-    public List<CFItem> getCFPackages(String sourceId) throws Exception
+    public CFPackages getCFPackages(String sourceId) throws Exception
     {
-        List<CFItem> cfItems = null;
+        CFPackages cfPackages = null;
         
         HttpClient httpClient = HttpClientBuilder.create().build();
         
@@ -218,15 +219,45 @@ public class OpenSALTClient
             String responseString = EntityUtils.toString(entity);   
             
             JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
+            System.out.println(responseJSON.toString());
             
             ObjectMapper mapper = new ObjectMapper();
-            CFPackages tmpCFPackages = mapper.readValue(responseJSON.toString(), CFPackages.class);
-            
-            cfItems = tmpCFPackages.getCFItems();
+            cfPackages = mapper.readValue(responseJSON.toString(), CFPackages.class);
         }
         
+        return cfPackages;
+    }
+    
+    /**
+     * <p>This is a request to the service provider to provide the CFItems for the specific Competency Framework Package.</p>
+     * 
+     * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
+     * @return sourceId - A set of CFItem objects
+     * @throws Exception - catch all for exceptions
+     */
+    public List<CFItem> getCFPackageItems(String sourceId) throws Exception
+    {
+        CFPackages cfPackages = getCFPackages(sourceId);
+        
+        List<CFItem> cfItems = cfPackages.getCFItems();
+        
         return cfItems;
+    }
+    
+    /**
+     * <p>This is a request to the service provider to provide the CFAssociations for the specific Competency Framework Package.</p>
+     * 
+     * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
+     * @return sourceId - A set of CFItem objects
+     * @throws Exception - catch all for exceptions
+     */
+    public List<CFAssociation> getCFPackageAssociations(String sourceId) throws Exception
+    {
+        CFPackages cfPackages = getCFPackages(sourceId);
+        
+        List<CFAssociation> cfAssociations = cfPackages.getCFAssociations();
+        
+        return cfAssociations;
     }
     
     /**
@@ -340,7 +371,9 @@ public class OpenSALTClient
             Map<String, CFItem> cfItemsMap = new HashMap<String, CFItem>();
             
             // Get ALL the levels of the document and store them in the hash map
-            List<CFItem> cfItems = getCFPackages(sourceId);
+            CFPackages cfPackages = getCFPackages(sourceId);
+            
+            List<CFItem> cfItems = cfPackages.getCFItems();
             for(CFItem tmpCFItem : cfItems)
             {
                 cfItemsMap.put(tmpCFItem.getIdentifier(), tmpCFItem);
@@ -352,7 +385,25 @@ public class OpenSALTClient
             // Loop the full set again to get the top level children of the document
             for(CFItem tmpCFItem : cfItems)
             {
-                if(tmpCFItem.getCFItemType() == null)
+                boolean isTopLevelItem = false;
+                List<CFAssociation> tmpAssociations = cfPackages.getCFAssociations();
+                for(CFAssociation tmpCFAssociation : tmpAssociations)
+                {
+                    OriginNodeURI tmpOriginNodeURI = tmpCFAssociation.getOriginNodeURI();
+                    DestinationNodeURI tmpDestinationNodeURI = tmpCFAssociation.getDestinationNodeURI();
+                    
+                    if(tmpDestinationNodeURI != null && tmpOriginNodeURI != null)
+                    {
+                        if(tmpDestinationNodeURI.getIdentifier().equalsIgnoreCase(sourceId) 
+                                && tmpOriginNodeURI.getIdentifier().equalsIgnoreCase(tmpCFItem.getIdentifier()))
+                        {
+                            isTopLevelItem = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if(isTopLevelItem)
                 {
                     // Create new standard object
                     Standard topLevelStandard = new Standard();
@@ -401,7 +452,8 @@ public class OpenSALTClient
                 Map<String, CFItem> cfItemsMap = new HashMap<String, CFItem>();
                 
                 // Get ALL the levels of the document and store them in the hash map
-                List<CFItem> cfItems = getCFPackages(tmpCFDocument.getIdentifier());
+                CFPackages cfPackages = getCFPackages(tmpCFDocument.getIdentifier());
+                List<CFItem> cfItems = cfPackages.getCFItems();
                 for(CFItem tmpCFItem : cfItems)
                 {
                     cfItemsMap.put(tmpCFItem.getIdentifier(), tmpCFItem);
