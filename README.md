@@ -112,7 +112,25 @@ if(tmpCFDocument != null)
 
 ```java	
 // Get an entire framework package
-List<CFItem> cfItems = client.getCFPackages("c5fb0812-d7cb-11e8-824f-0242ac160002");
+CFPackages cfPackages = client.getCFPackages("c5fb0812-d7cb-11e8-824f-0242ac160002");
+
+// Get the items for that package
+List<CFItem> cfItems = cfPackages.getCFItems();
+
+for(CFItem tmpCFItem : cfItems)
+{
+    if(tmpCFItem.getCFItemType() == null)
+    {
+        System.out.println("Identifier: " + tmpCFItem.getIdentifier() + " [" + tmpCFItem.getCFItemType() + "] " + tmpCFItem.getFullStatement());
+    }
+}
+```
+
+**Get an entire framework of package items**
+
+```java	
+// Get an entire framework package
+List<CFItem> cfItems = client.getCFPackageItems("c5fb0812-d7cb-11e8-824f-0242ac160002");
             
 for(CFItem tmpCFItem : cfItems)
 {
