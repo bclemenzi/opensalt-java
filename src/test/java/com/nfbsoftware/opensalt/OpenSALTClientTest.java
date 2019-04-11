@@ -9,6 +9,7 @@ import com.nfbsoftware.opensalt.model.CFDocument;
 import com.nfbsoftware.opensalt.model.CFItem;
 import com.nfbsoftware.opensalt.model.CFPackages;
 import com.nfbsoftware.opensalt.model.OriginNodeURI;
+import com.nfbsoftware.standards.model.Crosswalk;
 import com.nfbsoftware.standards.model.Standard;
 
 import junit.framework.Test;
@@ -285,7 +286,8 @@ public class OpenSALTClientTest extends TestCase
             
             System.out.println((new Date()).getTime());
             
-            Standard fullStandardsDocument = null; //client.getFullHierarchicalStandard("4d6e94e4-f280-11e8-9cff-0242ac140002");
+            //Standard fullStandardsDocument = client.getFullHierarchicalStandard("4d6e94e4-f280-11e8-9cff-0242ac140002");
+            Standard fullStandardsDocument = null;  //client.getFullHierarchicalStandard("4d6e94e4-f280-11e8-9cff-0242ac140002");
             
             if(fullStandardsDocument != null)
             {
@@ -350,5 +352,206 @@ public class OpenSALTClientTest extends TestCase
         }
         
         System.out.println("====> Finished OpenSALTClientTest.testBuildHierarchicalJSONForCFItem");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testItemToItemCrosswalk() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testItemToItemCrosswalk");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            Long startTime = (new Date()).getTime();
+            System.out.println(startTime);
+            
+            String rosettaDocumentId = "c5fb0812-d7cb-11e8-824f-0242ac160002";
+            String fromItemId = "5acff4b8-f280-11e8-9cff-0242ac140002";
+            String toItemId = "5ca43735-f280-11e8-9cff-0242ac140002";
+            
+            // Pass in a CFItem ID to get the subset of the document
+            Crosswalk tmpCrosswalk = client.getCFItemCrosswalk(rosettaDocumentId, fromItemId, toItemId);
+            
+            if(tmpCrosswalk != null)
+            {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+                
+                System.out.println(jsonInString);
+            }
+            
+            Long finishTime = (new Date()).getTime();
+            System.out.println(finishTime);
+            
+            System.out.println("Test TAT: " + (finishTime - startTime));
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testItemToItemCrosswalk");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testItemToItemCrosswalkByDocumentTitle() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testItemToItemCrosswalkByDocumentTitle");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            Long startTime = (new Date()).getTime();
+            System.out.println(startTime);
+            
+            String rosettaDocumentTitle = "PCG Compendium for";
+            String fromItemId = "5acff4b8-f280-11e8-9cff-0242ac140002";
+            String toItemId = "5ca43735-f280-11e8-9cff-0242ac140002";
+            
+            // Pass in a CFItem ID to get the subset of the document
+            Crosswalk tmpCrosswalk = client.getCFItemCrosswalkByDocumentTitle(rosettaDocumentTitle, fromItemId, toItemId);
+            
+            if(tmpCrosswalk != null)
+            {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+                
+                System.out.println(jsonInString);
+            }
+            
+            Long finishTime = (new Date()).getTime();
+            System.out.println(finishTime);
+            
+            System.out.println("Test TAT: " + (finishTime - startTime));
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testItemToItemCrosswalkByDocumentTitle");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testItemToDocumentCrosswalks() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testItemToDocumentCrosswalks");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            Long startTime = (new Date()).getTime();
+            System.out.println(startTime);
+            
+            // PCG Compendium for Mathematics
+            String rosettaDocumentId = "c5fb0812-d7cb-11e8-824f-0242ac160002";
+            
+            // 
+            String fromItemId = "5ca44a05-f280-11e8-9cff-0242ac140002";
+            
+            // PCG - Pennsylvania Core Math Standards
+            String toDcoumentId = "4d6d3d12-f280-11e8-9cff-0242ac140002";
+            
+            // Pass in a CFItem ID to get the subset of the document
+            List<Crosswalk> tmpCrosswalks = client.getCFItemCrosswalks(rosettaDocumentId, fromItemId, toDcoumentId);
+            
+            int counter = 1;
+            for(Crosswalk tmpCrosswalk : tmpCrosswalks)
+            {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+                
+                System.out.println("Crosswalk " + counter + ": " + jsonInString);
+                
+                counter++;
+            }
+            
+            Long finishTime = (new Date()).getTime();
+            System.out.println(finishTime);
+            
+            System.out.println("Test TAT: " + (finishTime - startTime));
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testItemToDocumentCrosswalks");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testItemToDocumentCrosswalksByDocumentTitle() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testItemToDocumentCrosswalksByDocumentTitle");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            Long startTime = (new Date()).getTime();
+            System.out.println(startTime);
+            
+            String rosettaDocumentTitle = "PCG Compendium for";
+            String fromItemId = "5ca44a05-f280-11e8-9cff-0242ac140002";
+            
+            // PCG - Pennsylvania Core Math Standards
+            String toDcoumentId = "4d6d3d12-f280-11e8-9cff-0242ac140002";
+            
+            // Pass in a CFItem ID to get the subset of the document
+            List<Crosswalk> tmpCrosswalks = client.getCFItemCrosswalksByDocumentTitle(rosettaDocumentTitle, fromItemId, toDcoumentId);
+            
+            int counter = 1;
+            for(Crosswalk tmpCrosswalk : tmpCrosswalks)
+            {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+                
+                System.out.println("Crosswalk " + counter + ": " + jsonInString);
+                
+                counter++;
+            }
+            
+            Long finishTime = (new Date()).getTime();
+            System.out.println(finishTime);
+            
+            System.out.println("Test TAT: " + (finishTime - startTime));
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testItemToDocumentCrosswalksByDocumentTitle");
     }
 }

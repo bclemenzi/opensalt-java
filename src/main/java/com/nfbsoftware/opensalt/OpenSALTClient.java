@@ -1,6 +1,7 @@
 package com.nfbsoftware.opensalt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.text.DiffRow;
+import com.github.difflib.text.DiffRowGenerator;
 import com.nfbsoftware.opensalt.model.CFAssociation;
 import com.nfbsoftware.opensalt.model.CFDocument;
 import com.nfbsoftware.opensalt.model.CFItem;
@@ -26,6 +30,7 @@ import com.nfbsoftware.opensalt.model.CFPackages;
 import com.nfbsoftware.opensalt.model.DestinationNodeURI;
 import com.nfbsoftware.opensalt.model.Documents;
 import com.nfbsoftware.opensalt.model.OriginNodeURI;
+import com.nfbsoftware.standards.model.Crosswalk;
 import com.nfbsoftware.standards.model.Standard;
 
 /**
@@ -219,7 +224,7 @@ public class OpenSALTClient
             String responseString = EntityUtils.toString(entity);   
             
             JSONObject responseJSON = new JSONObject(responseString);
-            System.out.println(responseJSON.toString());
+            //System.out.println(responseJSON.toString());
             
             ObjectMapper mapper = new ObjectMapper();
             cfPackages = mapper.readValue(responseJSON.toString(), CFPackages.class);
@@ -237,6 +242,8 @@ public class OpenSALTClient
      */
     public List<CFItem> getCFPackageItems(String sourceId) throws Exception
     {
+        logger.debug("Getting getCFPackageItems " + sourceId);
+        
         CFPackages cfPackages = getCFPackages(sourceId);
         
         List<CFItem> cfItems = cfPackages.getCFItems();
@@ -253,6 +260,8 @@ public class OpenSALTClient
      */
     public List<CFAssociation> getCFPackageAssociations(String sourceId) throws Exception
     {
+        logger.debug("Getting getCFPackageAssociations " + sourceId);
+        
         CFPackages cfPackages = getCFPackages(sourceId);
         
         List<CFAssociation> cfAssociations = cfPackages.getCFAssociations();
@@ -276,7 +285,7 @@ public class OpenSALTClient
         // specify the host, protocol, and port
         HttpHost target = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
         
-        logger.debug("Getting CFDocument " + sourceId);
+        logger.debug("Getting getCFItem " + sourceId);
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFItems/" + sourceId);
@@ -530,5 +539,305 @@ public class OpenSALTClient
                 }
             }
         }
+    }
+    
+    /**
+     * <p>Returns a crosswalk object that contains the semantic comparison between the two CFItems.</p>
+     * 
+     * @param rosettaDocumentTitle - The full or partial name of the CFDocument being uses as a "rosetta stone" between two CFItems contained in separate CFDocuments
+     * @param fromCFItemId - The GUID that identifies the CFItem in CFDocument one.
+     * @param toCFItemId - The GUID that identifies the CFItem in CFDocument two.
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public Crosswalk getCFItemCrosswalkByDocumentTitle(String rosettaDocumentTitle, String fromCFItemId, String toCFItemId) throws Exception
+    {
+        String rosettaCFDocumentId = "";
+        
+        List<CFAssociation> fromCFAssociations = getCFItemAssociations(fromCFItemId);
+
+        // Loop through associations to find associations to the rosetta document.
+        for(CFAssociation tmpCFAssociation : fromCFAssociations)
+        {
+            String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
+            
+            CFItem associatedItem = getCFItem(associatedItemId);
+            
+            if(associatedItem.getCFDocumentURI().getTitle().contains(rosettaDocumentTitle))
+            {
+                rosettaCFDocumentId = associatedItem.getCFDocumentURI().getIdentifier();
+                
+                break;
+            }
+        }
+        
+        if(!StringUtils.isEmpty(rosettaCFDocumentId))
+        {
+            return getCFItemCrosswalk(rosettaCFDocumentId, fromCFItemId, toCFItemId);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * <p>Returns a crosswalk object that contains the semantic comparison between the two CFItems.</p>
+     * 
+     * @param rosettaCFDocumentId - The GUID that identifies the CFDocument being uses as a "rosetta stone" between two CFItems contained in separate CFDocuments
+     * @param fromCFItemId - The GUID that identifies the CFItem in CFDocument one.
+     * @param toCFItemId - The GUID that identifies the CFItem in CFDocument two.
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public Crosswalk getCFItemCrosswalk(String rosettaCFDocumentId, String fromCFItemId, String toCFItemId) throws Exception
+    {
+        Crosswalk tmpCrosswalk = new Crosswalk();
+        
+        // Get our rosetta stone document
+        CFDocument rosettaDocument = getCFDocument(rosettaCFDocumentId);
+        tmpCrosswalk.setCfDocumentId(rosettaCFDocumentId);
+        tmpCrosswalk.setCfDocument(rosettaDocument);
+        
+        // Get our FROM CFItem
+        CFItem fromCFItem = getCFItem(fromCFItemId);
+        tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+        tmpCrosswalk.setFromCFItem(fromCFItem);
+        
+        // Get our TO CFItem
+        CFItem toCFItem = getCFItem(toCFItemId);
+        tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+        tmpCrosswalk.setToCFItem(toCFItem);
+        
+        // Collection of items in the rosetta document that are not children of itself
+        List<CFItem> rosettaItemAssociations = new ArrayList<CFItem>();
+        
+        // Get all associations for the first item
+        List<CFAssociation> fromCFAssociations = getCFItemAssociations(fromCFItem.getIdentifier());
+
+        // Loop through associations to find associations to the rosetta document.
+        for(CFAssociation tmpCFAssociation : fromCFAssociations)
+        {
+            // Find associations to rosetta document
+            if(!tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+            {
+                String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
+                
+                CFItem associatedItem = getCFItem(associatedItemId);
+                
+                if(associatedItem.getCFDocumentURI().getIdentifier().equalsIgnoreCase(rosettaDocument.getIdentifier()))
+                {
+                    rosettaItemAssociations.add(associatedItem);
+                    
+                    tmpCrosswalk.getAssociationTypes().add(tmpCFAssociation.getAssociationType());
+                    tmpCrosswalk.setFromItemAssociationOfDocument(tmpCFAssociation.getAssociationType());
+                    
+                    break;
+                }
+            }
+        }
+        
+        // Loop though the rosetta items to find associations with the toCFItem
+        for(CFItem tmpRosettaCFItem : rosettaItemAssociations)
+        {
+            List<CFAssociation> toCFAssociations = getCFItemAssociations(tmpRosettaCFItem.getIdentifier());
+            
+            // Loop through associations to find associations to the rosetta document.
+            for(CFAssociation tmpCFAssociation : toCFAssociations)
+            {
+                // Find associations to rosetta document
+                if(!tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+                {
+                    OriginNodeURI tmpOriginNodeURI = tmpCFAssociation.getOriginNodeURI();
+                    
+                    if(tmpOriginNodeURI != null)
+                    {
+                        if(tmpOriginNodeURI.getIdentifier().equalsIgnoreCase(toCFItem.getIdentifier()))
+                        {
+                            // Found the crosswalk element
+                            tmpCrosswalk.getAssociationTypes().add(tmpCFAssociation.getAssociationType());
+                            tmpCrosswalk.setDocumentAssociationOfToItem(tmpCFAssociation.getAssociationType());
+                            
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Perform the semantic comparison of text
+        String fromText = fromCFItem.getFullStatement();
+        String toText = toCFItem.getFullStatement();
+        
+        // Get the semantic comparison
+        String semanticComparison = generateSemanticComparison(fromText, toText);
+        
+        tmpCrosswalk.setSemanticComparison(semanticComparison);
+        
+        return tmpCrosswalk;
+    }
+    
+    /**
+     * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
+     * 
+     * @param rosettaDocumentTitle - The full or partial name of the CFDocument being uses as a "rosetta stone" between two CFItems contained in separate CFDocuments
+     * @param fromCFItemId - The GUID that identifies the CFItem we're looking to associate with.
+     * @param toCFDocumentId - The GUID that identifies the CFDocument we are looking for associations in.
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public List<Crosswalk> getCFItemCrosswalksByDocumentTitle(String rosettaDocumentTitle, String fromCFItemId, String toCFDocumentId) throws Exception
+    {
+        String rosettaCFDocumentId = "";
+        
+        List<CFAssociation> fromCFAssociations = getCFItemAssociations(fromCFItemId);
+
+        // Loop through associations to find associations to the rosetta document.
+        for(CFAssociation tmpCFAssociation : fromCFAssociations)
+        {
+            String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
+            
+            CFItem associatedItem = getCFItem(associatedItemId);
+            
+            if(associatedItem.getCFDocumentURI().getTitle().contains(rosettaDocumentTitle))
+            {
+                rosettaCFDocumentId = associatedItem.getCFDocumentURI().getIdentifier();
+                
+                break;
+            }
+        }
+        
+        if(!StringUtils.isEmpty(rosettaCFDocumentId))
+        {
+            return getCFItemCrosswalks(rosettaCFDocumentId, fromCFItemId, toCFDocumentId);
+        }
+        
+        return new ArrayList<Crosswalk>();
+    }
+    
+    /**
+     * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
+     * 
+     * @param rosettaCFDocumentId - The GUID that identifies the CFDocument being uses as a "rosetta stone" between two CFItems contained in separate CFDocuments
+     * @param fromCFItemId - The GUID that identifies the CFItem we're looking to associate with.
+     * @param toCFDocumentId - The GUID that identifies the CFDocument we are looking for associations in.
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public List<Crosswalk> getCFItemCrosswalks(String rosettaCFDocumentId, String fromCFItemId, String toCFDocumentId) throws Exception
+    {
+        List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
+        
+        // Get our rosetta stone document
+        CFDocument rosettaDocument = getCFDocument(rosettaCFDocumentId);
+        
+        // Get our FROM CFItem
+        CFItem fromCFItem = getCFItem(fromCFItemId);
+        
+        // Collection of items in the rosetta document that are not children of itself
+        List<CFItem> rosettaItemAssociations = new ArrayList<CFItem>();
+        
+        // Get all associations for the first item
+        List<CFAssociation> fromCFAssociations = getCFItemAssociations(fromCFItem.getIdentifier());
+
+        // Loop through associations to find associations to the rosetta document.
+        for(CFAssociation tmpCFAssociation : fromCFAssociations)
+        {
+            // Find associations to rosetta document
+            if(!tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+            {
+                String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
+                
+                CFItem associatedItem = getCFItem(associatedItemId);
+                
+                if(associatedItem.getCFDocumentURI().getIdentifier().equalsIgnoreCase(rosettaDocument.getIdentifier()))
+                {
+                    rosettaItemAssociations.add(associatedItem);
+                    
+                    break;
+                }
+            }
+        }
+        
+        // Loop though the rosetta items to find associations with the toCFItem
+        for(CFItem tmpRosettaCFItem : rosettaItemAssociations)
+        {
+            List<CFAssociation> toCFAssociations = getCFItemAssociations(tmpRosettaCFItem.getIdentifier());
+            
+            // Loop through associations to find associations to the rosetta document.
+            for(CFAssociation tmpCFAssociation : toCFAssociations)
+            {
+                // Find associations to rosetta document
+                if(!tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+                {
+                    OriginNodeURI tmpOriginNodeURI = tmpCFAssociation.getOriginNodeURI();
+                    
+                    if(tmpOriginNodeURI != null)
+                    {
+                        // If the association is from the TO document, create the crosswalk.
+                        if(tmpCFAssociation.getCFDocumentURI().getIdentifier().equalsIgnoreCase(toCFDocumentId))
+                        {
+                            String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
+                            CFItem associatedItem = getCFItem(associatedItemId);
+                            
+                            Crosswalk tmpCrosswalk = new Crosswalk();
+                            tmpCrosswalk.setCfDocumentId(rosettaCFDocumentId);
+                            tmpCrosswalk.setCfDocument(rosettaDocument);
+                            tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+                            tmpCrosswalk.setFromCFItem(fromCFItem);
+                            tmpCrosswalk.setToCFItemId(associatedItem.getIdentifier());
+                            tmpCrosswalk.setToCFItem(associatedItem);
+                            
+                            // Found the crosswalk element
+                            tmpCrosswalk.getAssociationTypes().add(tmpCFAssociation.getAssociationType());
+                            tmpCrosswalk.setDocumentAssociationOfToItem(tmpCFAssociation.getAssociationType());
+                            
+                            // Perform the semantic comparison of text
+                            String fromText = StringUtils.trimToEmpty(fromCFItem.getFullStatement());
+                            String toText = StringUtils.trimToEmpty(associatedItem.getFullStatement());
+                            
+                            // Get the semantic comparison
+                            String semanticComparison = generateSemanticComparison(fromText, toText);
+                            
+                            tmpCrosswalk.setSemanticComparison(semanticComparison);
+                            
+                            // Add the crosswalk to the result list.
+                            tmpCrosswalkList.add(tmpCrosswalk);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return tmpCrosswalkList;
+    }
+
+    /**
+     * <p>Method for running to text strings through a semantic comparison engine.</p>
+     * 
+     * @param fromText - Beginning text
+     * @param toText - Comparison text
+     * @return - returns the semantic comparison text
+     * 
+     * @throws DiffException
+     */
+    private String generateSemanticComparison(String fromText, String toText) throws DiffException
+    {
+        String semanticComparison = "";
+        
+        DiffRowGenerator generator = DiffRowGenerator.create()
+                .showInlineDiffs(true)
+                .mergeOriginalRevised(true)
+                .inlineDiffByWord(true)
+                .oldTag(f -> "~")
+                .newTag(f -> "**")
+                .build();
+        
+        List<DiffRow> rows = generator.generateDiffRows(
+                Arrays.asList(fromText),
+                Arrays.asList(toText));
+        
+        //System.out.println(rows.get(0).getOldLine());
+        semanticComparison = rows.get(0).getOldLine();
+        
+        return semanticComparison;
     }
 }

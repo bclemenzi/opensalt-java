@@ -12,6 +12,7 @@ Features
 
   * Follows the IMS Global CASE v1.0 OpenAPI
   * Fully constructed and inflated document trees
+  * Standards crosswalking with semantic comparisons
   * Published on Maven Central Repository
 
 Getting started
@@ -24,7 +25,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.7</version>
+   <version>1.0.8</version>
 </dependency>
 ```
 Usage
@@ -170,5 +171,58 @@ Standard partialStandardsDocument = client.getFullHierarchicalStandard("5ad17357
 if(partialStandardsDocument != null)
 {
     System.out.println(partialStandardsDocument.getDocumentTitle());
+}
+```
+
+**Crosswalk two standards with a semantic comparison output**
+
+```java	
+// CFDocument used as the bridge between two standards in separate documents.
+String rosettaDocumentId = "c5fb0812-d7cb-11e8-824f-0242ac160002";
+
+// Standard (CFItem) from document one
+String fromItemId = "5acff4b8-f280-11e8-9cff-0242ac140002";
+
+// Standard (CFItem) from document two
+String toItemId = "5ca43735-f280-11e8-9cff-0242ac140002";
+            
+// Get the crosswalk between two standards
+Crosswalk tmpCrosswalk = client.getCFItemCrosswalk(rosettaDocumentId, fromItemId, toItemId);
+
+if(tmpCrosswalk != null)
+{
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+    
+    System.out.println(jsonInString);
+}
+```
+
+**Crosswalk a single standard against an entire document with a semantic comparison output**
+
+```java	
+// CFDocument used as the bridge between two standards in separate documents.
+// CFDocument = PCG Compendium for Mathematics
+String rosettaDocumentId = "c5fb0812-d7cb-11e8-824f-0242ac160002";
+
+// Standard (CFItem) from Tennessee Academic Standards: Mathematics - 1.OA.A.1
+String fromItemId = "5ca44a05-f280-11e8-9cff-0242ac140002";
+
+// Cross walked against another states CFDcoument
+// CFDocument = Pennsylvania Core Math Standards
+String toDcoumentId = "4d6d3d12-f280-11e8-9cff-0242ac140002";
+
+// Pass in a CFItem ID to get the subset of the document
+List<Crosswalk> tmpCrosswalks = client.getCFItemCrosswalks(rosettaDocumentId, fromItemId, toDcoumentId);
+
+int counter = 1;
+for(Crosswalk tmpCrosswalk : tmpCrosswalks)
+{
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+    
+    System.out.println("Crosswalk " + counter + ": " + jsonInString);
+    
+    counter++;
 }
 ```
