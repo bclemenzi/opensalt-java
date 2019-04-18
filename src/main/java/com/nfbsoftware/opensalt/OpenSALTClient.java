@@ -3,8 +3,10 @@ package com.nfbsoftware.opensalt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -724,6 +726,7 @@ public class OpenSALTClient
      */
     public List<Crosswalk> getCFItemCrosswalks(String rosettaCFDocumentId, String fromCFItemId, String toCFDocumentId) throws Exception
     {
+        Set<String> toItemIds = new HashSet<String>();
         List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
         
         // Get our rosetta stone document
@@ -776,31 +779,38 @@ public class OpenSALTClient
                         if(tmpCFAssociation.getCFDocumentURI().getIdentifier().equalsIgnoreCase(toCFDocumentId))
                         {
                             String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
-                            CFItem associatedItem = getCFItem(associatedItemId);
                             
-                            Crosswalk tmpCrosswalk = new Crosswalk();
-                            tmpCrosswalk.setCfDocumentId(rosettaCFDocumentId);
-                            tmpCrosswalk.setCfDocument(rosettaDocument);
-                            tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
-                            tmpCrosswalk.setFromCFItem(fromCFItem);
-                            tmpCrosswalk.setToCFItemId(associatedItem.getIdentifier());
-                            tmpCrosswalk.setToCFItem(associatedItem);
-                            
-                            // Found the crosswalk element
-                            tmpCrosswalk.getAssociationTypes().add(tmpCFAssociation.getAssociationType());
-                            tmpCrosswalk.setDocumentAssociationOfToItem(tmpCFAssociation.getAssociationType());
-                            
-                            // Perform the semantic comparison of text
-                            String fromText = StringUtils.trimToEmpty(fromCFItem.getFullStatement());
-                            String toText = StringUtils.trimToEmpty(associatedItem.getFullStatement());
-                            
-                            // Get the semantic comparison
-                            String semanticComparison = generateSemanticComparison(fromText, toText);
-                            
-                            tmpCrosswalk.setSemanticComparison(semanticComparison);
-                            
-                            // Add the crosswalk to the result list.
-                            tmpCrosswalkList.add(tmpCrosswalk);
+                            if(!toItemIds.contains(associatedItemId))
+                            {
+                                CFItem associatedItem = getCFItem(associatedItemId);
+                                
+                                Crosswalk tmpCrosswalk = new Crosswalk();
+                                tmpCrosswalk.setCfDocumentId(rosettaCFDocumentId);
+                                tmpCrosswalk.setCfDocument(rosettaDocument);
+                                tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+                                tmpCrosswalk.setFromCFItem(fromCFItem);
+                                tmpCrosswalk.setToCFItemId(associatedItem.getIdentifier());
+                                tmpCrosswalk.setToCFItem(associatedItem);
+                                
+                                // Found the crosswalk element
+                                tmpCrosswalk.getAssociationTypes().add(tmpCFAssociation.getAssociationType());
+                                tmpCrosswalk.setDocumentAssociationOfToItem(tmpCFAssociation.getAssociationType());
+                                
+                                // Perform the semantic comparison of text
+                                String fromText = StringUtils.trimToEmpty(fromCFItem.getFullStatement());
+                                String toText = StringUtils.trimToEmpty(associatedItem.getFullStatement());
+                                
+                                // Get the semantic comparison
+                                String semanticComparison = generateSemanticComparison(fromText, toText);
+                                
+                                tmpCrosswalk.setSemanticComparison(semanticComparison);
+                                
+                                // Add the crosswalk to the result list.
+                                tmpCrosswalkList.add(tmpCrosswalk);
+                                
+                                // Add this id to the list of used items
+                                toItemIds.add(associatedItemId);
+                            }
                         }
                     }
                 }
