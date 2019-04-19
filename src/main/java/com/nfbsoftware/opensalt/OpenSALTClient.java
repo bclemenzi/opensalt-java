@@ -837,8 +837,8 @@ public class OpenSALTClient
                 .showInlineDiffs(true)
                 .mergeOriginalRevised(true)
                 .inlineDiffByWord(true)
-                .oldTag(f -> "~")
-                .newTag(f -> "**")
+                .oldTag(f -> f?"<span class=\"openSaltOldTag\">":"</span>")
+                .newTag(f -> f?"<span class=\"openSaltNewTag\">":"</span>")
                 .build();
         
         List<DiffRow> rows = generator.generateDiffRows(

@@ -483,6 +483,8 @@ public class OpenSALTClientTest extends TestCase
                 
                 System.out.println("Crosswalk " + counter + ": " + jsonInString);
                 
+                System.out.println(tmpCrosswalk.getSemanticComparison());
+                
                 counter++;
             }
             
