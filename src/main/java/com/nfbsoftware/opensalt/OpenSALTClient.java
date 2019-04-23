@@ -701,6 +701,7 @@ public class OpenSALTClient
             
             if(associatedItem.getCFDocumentURI().getTitle().contains(rosettaDocumentTitle))
             {
+                //System.out.println("Rossetta Document [" + associatedItem.getCFDocumentURI().getIdentifier() + "] " + associatedItem.getCFDocumentURI().getTitle());
                 rosettaCFDocumentId = associatedItem.getCFDocumentURI().getIdentifier();
                 
                 break;
@@ -731,6 +732,7 @@ public class OpenSALTClient
         
         // Get our rosetta stone document
         CFDocument rosettaDocument = getCFDocument(rosettaCFDocumentId);
+        //System.out.println("rosettaDocument: " + rosettaDocument.getTitle());
         
         // Get our FROM CFItem
         CFItem fromCFItem = getCFItem(fromCFItemId);
@@ -748,6 +750,7 @@ public class OpenSALTClient
             if(!tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
             {
                 String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
+                //System.out.println("associatedItemId: " + associatedItemId + "  " + tmpCFAssociation.getDestinationNodeURI().getTitle());
                 
                 CFItem associatedItem = getCFItem(associatedItemId);
                 
@@ -775,22 +778,24 @@ public class OpenSALTClient
                     
                     if(tmpOriginNodeURI != null)
                     {
+                        CFItem originItem = getCFItem(tmpOriginNodeURI.getIdentifier());
+                        //System.out.println("originItem [" + originItem.getIdentifier() + "]: " + originItem.getHumanCodingScheme() + "  (" + originItem.getCFDocumentURI().getTitle() + ")");
+                        
                         // If the association is from the TO document, create the crosswalk.
-                        if(tmpCFAssociation.getCFDocumentURI().getIdentifier().equalsIgnoreCase(toCFDocumentId))
+                        if(originItem.getCFDocumentURI().getIdentifier().equalsIgnoreCase(toCFDocumentId))
                         {
-                            String associatedItemId = tmpCFAssociation.getDestinationNodeURI().getIdentifier();
-                            
-                            if(!toItemIds.contains(associatedItemId))
+                            if(!toItemIds.contains(originItem.getIdentifier()))
                             {
-                                CFItem associatedItem = getCFItem(associatedItemId);
-                                
+                                //System.out.println("toItemIds associatedItemId document: " + originItem.getCFDocumentURI().getTitle() + "  " + originItem.getCFDocumentURI().getIdentifier());
+                                //System.out.println("toItemIds ItemId: " + originItem.getIdentifier() + "  " + originItem.getHumanCodingScheme());
+
                                 Crosswalk tmpCrosswalk = new Crosswalk();
                                 tmpCrosswalk.setCfDocumentId(rosettaCFDocumentId);
                                 tmpCrosswalk.setCfDocument(rosettaDocument);
                                 tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
                                 tmpCrosswalk.setFromCFItem(fromCFItem);
-                                tmpCrosswalk.setToCFItemId(associatedItem.getIdentifier());
-                                tmpCrosswalk.setToCFItem(associatedItem);
+                                tmpCrosswalk.setToCFItemId(originItem.getIdentifier());
+                                tmpCrosswalk.setToCFItem(originItem);
                                 
                                 // Found the crosswalk element
                                 tmpCrosswalk.getAssociationTypes().add(tmpCFAssociation.getAssociationType());
@@ -798,7 +803,7 @@ public class OpenSALTClient
                                 
                                 // Perform the semantic comparison of text
                                 String fromText = StringUtils.trimToEmpty(fromCFItem.getFullStatement());
-                                String toText = StringUtils.trimToEmpty(associatedItem.getFullStatement());
+                                String toText = StringUtils.trimToEmpty(originItem.getFullStatement());
                                 
                                 // Get the semantic comparison
                                 String semanticComparison = generateSemanticComparison(fromText, toText);
@@ -809,7 +814,7 @@ public class OpenSALTClient
                                 tmpCrosswalkList.add(tmpCrosswalk);
                                 
                                 // Add this id to the list of used items
-                                toItemIds.add(associatedItemId);
+                                toItemIds.add(originItem.getIdentifier());
                             }
                         }
                     }
