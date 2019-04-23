@@ -778,12 +778,12 @@ public class OpenSALTClient
                     
                     if(tmpOriginNodeURI != null)
                     {
-                        CFItem originItem = getCFItem(tmpOriginNodeURI.getIdentifier());
-                        //System.out.println("originItem [" + originItem.getIdentifier() + "]: " + originItem.getHumanCodingScheme() + "  (" + originItem.getCFDocumentURI().getTitle() + ")");
-                        
                         // If the association is from the TO document, create the crosswalk.
-                        if(originItem.getCFDocumentURI().getIdentifier().equalsIgnoreCase(toCFDocumentId))
+                        if(tmpCFAssociation.getCFDocumentURI().getIdentifier().equalsIgnoreCase(toCFDocumentId))
                         {
+                            CFItem originItem = getCFItem(tmpOriginNodeURI.getIdentifier());
+                            //System.out.println("originItem [" + originItem.getIdentifier() + "]: " + originItem.getHumanCodingScheme() + "  (" + originItem.getCFDocumentURI().getTitle() + ")");
+                            
                             if(!toItemIds.contains(originItem.getIdentifier()))
                             {
                                 //System.out.println("toItemIds associatedItemId document: " + originItem.getCFDocumentURI().getTitle() + "  " + originItem.getCFDocumentURI().getIdentifier());

@@ -25,7 +25,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.12</version>
+   <version>1.0.14</version>
 </dependency>
 ```
 Usage
