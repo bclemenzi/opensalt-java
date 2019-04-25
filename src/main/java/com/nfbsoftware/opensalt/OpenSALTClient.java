@@ -254,6 +254,55 @@ public class OpenSALTClient
     }
     
     /**
+     * <p>This is a request to the service provider to provide the top-most CFItems for the specific Competency Framework Package.</p>
+     * 
+     * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
+     * @return sourceId - A set of CFItem objects
+     * @throws Exception - catch all for exceptions
+     */
+    public List<CFItem> getTopLevelCFPackageItems(String sourceId) throws Exception
+    {
+        logger.debug("Getting getTopLevelCFPackageItems " + sourceId);
+        
+        Set<String> itemIds = new HashSet<String>();
+        List<CFItem> topLevelCfItems = new ArrayList<CFItem>(); 
+        
+        // Get our full framework package
+        CFPackages cfPackages = getCFPackages(sourceId);
+        
+        // Get all the items of the package
+        List<CFItem> cfItems = cfPackages.getCFItems();
+        
+        // Loop through the items to find the top level items
+        for(CFItem tmpCFItem : cfItems)
+        {
+            if(!itemIds.contains(tmpCFItem.getIdentifier()))
+            {
+                List<CFAssociation> tmpAssociations = cfPackages.getCFAssociations();
+                for(CFAssociation tmpCFAssociation : tmpAssociations)
+                {
+                    OriginNodeURI tmpOriginNodeURI = tmpCFAssociation.getOriginNodeURI();
+                    DestinationNodeURI tmpDestinationNodeURI = tmpCFAssociation.getDestinationNodeURI();
+                    
+                    if(tmpDestinationNodeURI != null && tmpOriginNodeURI != null)
+                    {
+                        if(tmpDestinationNodeURI.getIdentifier().equalsIgnoreCase(sourceId) 
+                                && tmpOriginNodeURI.getIdentifier().equalsIgnoreCase(tmpCFItem.getIdentifier()))
+                        {
+                            topLevelCfItems.add(tmpCFItem);
+                            itemIds.add(tmpCFItem.getIdentifier());
+                            
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return topLevelCfItems;
+    }
+    
+    /**
      * <p>This is a request to the service provider to provide the CFAssociations for the specific Competency Framework Package.</p>
      * 
      * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.

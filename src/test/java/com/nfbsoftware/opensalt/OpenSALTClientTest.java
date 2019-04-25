@@ -202,6 +202,40 @@ public class OpenSALTClientTest extends TestCase
      * 
      * @throws Exception
      */
+    public void testGetTopLevelCFPackageItems() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testGetTopLevelCFPackageItems");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            List<CFItem> cfItems = client.getTopLevelCFPackageItems("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            
+            for(CFItem tmpCFItem : cfItems)
+            {
+                if(tmpCFItem.getCFItemType() == null)
+                {
+                    System.out.println("Identifier: " + tmpCFItem.getIdentifier() + " - " + tmpCFItem.getFullStatement());
+                }
+            }
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testGetTopLevelCFPackageItems");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
     public void testGetCFItem() throws Exception
     {
         System.out.println("====> Starting OpenSALTClientTest.testGetCFItem");
