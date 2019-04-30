@@ -361,6 +361,42 @@ public class OpenSALTClient
     }
     
     /**
+     * <p>This is a request to the Service Provider to provide the specified Competency Framework Item.</p>
+     * 
+     * @param sourceId The GUID that identifies the Competency Framework Item that is to be read from the service provider.
+     * @return sourceId - A single CFDocument object
+     * @throws Exception - catch all for exceptions
+     */
+    public CFItem getCFItemParent(String sourceId) throws Exception
+    {
+        CFItem cfItemParent = null;
+        
+        CFItem childItem = getCFItem(sourceId);
+        
+        if(childItem != null)
+        {
+            List<CFAssociation> associations = getCFItemAssociations(sourceId);
+            
+            for(CFAssociation tmpCFAssociation : associations)
+            {
+                if(tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+                {
+                    DestinationNodeURI destinationNodeURI = tmpCFAssociation.getDestinationNodeURI();
+                    
+                    if(destinationNodeURI != null)
+                    {
+                        String parentItemId = destinationNodeURI.getIdentifier();
+                        
+                        cfItemParent = getCFItem(parentItemId);
+                    }
+                }
+            }
+        }
+        
+        return cfItemParent;
+    }
+    
+    /**
      * <p>This is a request to the Service Provider to provide the all of the Competency Associations for the specified CFItem.</p>
      * 
      * @param sourceId The GUID that identifies the Competency Framework Document that is to be read from the service provider.
