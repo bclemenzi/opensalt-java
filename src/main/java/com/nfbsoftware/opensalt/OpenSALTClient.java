@@ -387,7 +387,12 @@ public class OpenSALTClient
                     {
                         String parentItemId = destinationNodeURI.getIdentifier();
                         
-                        cfItemParent = getCFItem(parentItemId);
+                        if(!parentItemId.equalsIgnoreCase(sourceId))
+                        {
+                            cfItemParent = getCFItem(parentItemId);
+                            
+                            break;
+                        }
                     }
                 }
             }
