@@ -26,6 +26,7 @@ import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 import com.nfbsoftware.opensalt.model.CFAssociation;
 import com.nfbsoftware.opensalt.model.CFDocument;
+import com.nfbsoftware.opensalt.model.CFDocumentURI;
 import com.nfbsoftware.opensalt.model.CFItem;
 import com.nfbsoftware.opensalt.model.CFItemTypeURI;
 import com.nfbsoftware.opensalt.model.CFPackages;
@@ -789,12 +790,17 @@ public class OpenSALTClient
             
             CFItem associatedItem = getCFItem(associatedItemId);
             
-            if(associatedItem.getCFDocumentURI().getTitle().contains(rosettaDocumentTitle))
+            CFDocumentURI associatedCFDocumentURI = associatedItem.getCFDocumentURI();
+            
+            if(associatedCFDocumentURI != null)
             {
-                //System.out.println("Rossetta Document [" + associatedItem.getCFDocumentURI().getIdentifier() + "] " + associatedItem.getCFDocumentURI().getTitle());
-                rosettaCFDocumentId = associatedItem.getCFDocumentURI().getIdentifier();
-                
-                break;
+                if(associatedCFDocumentURI.getTitle().contains(rosettaDocumentTitle))
+                {
+                    //System.out.println("Rossetta Document [" + associatedItem.getCFDocumentURI().getIdentifier() + "] " + associatedItem.getCFDocumentURI().getTitle());
+                    rosettaCFDocumentId = associatedItem.getCFDocumentURI().getIdentifier();
+                    
+                    break;
+                }
             }
         }
         
