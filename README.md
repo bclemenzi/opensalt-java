@@ -13,6 +13,8 @@ Features
   * Follows the IMS Global CASE v1.0 OpenAPI
   * Fully constructed and inflated document trees
   * Standards crosswalking with semantic comparisons
+  * oAuth support to work with IMS Global's [CASE Network](https://casenetwork.imsglobal.org/cfdoc/)
+  * Support for [Public Consulting Group's Crosswalk Services](https://api-stg.opensalt.net/api/doc)
   * Published on Maven Central Repository
 
 Getting started
@@ -25,7 +27,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.18</version>
+   <version>1.0.20</version>
 </dependency>
 ```
 Usage
@@ -43,6 +45,28 @@ int hostPort = 443;
 // Init our client object with the host information
 OpenSALTClient openSaltClient = new OpenSALTClient(hostDomain, hostPort, hostScheme);
 ```
+**Authenticated Client Option**
+
+```java
+// Set the location of our CASE server
+String hostDomain = "casenetwork.imsglobal.org";
+String hostScheme = "https";
+int hostPort = 443;
+
+// Set the server's location and credentials
+String fullAuthenticationUrl = "https://oauth2-case.imsglobal.org/oauth2server/clienttoken";
+String clientId = "your client id here";
+String clientSecret = "your client secret here";
+String grantType = "client_credentials";
+String scope = "http://purl.imsglobal.org/casenetwork/case/v1p0/scope/core.readonly http://purl.imsglobal.org/casenetwork/case/v1p0/scope/all.readonly";
+
+// Init our client object with the host and client information
+OpenSALTClient openSaltClient = new OpenSALTClient(hostDomain, hostPort, hostScheme);
+
+// Set your account credentials to acquire an access token.
+client.setCredentials(fullAuthenticationUrl, clientId, clientSecret, grantType, scope);
+```
+
 Library Functions
 -----
 The current set of functions were designed to allow a developer to mimic the functionality of the search system found online: [OpenSALT.net](https://opensalt.net/api/doc)
@@ -232,6 +256,39 @@ String toDcoumentId = "4d6d3d12-f280-11e8-9cff-0242ac140002";
 
 // Pass in a CFItem ID to get the subset of the document
 List<Crosswalk> tmpCrosswalks = client.getCFItemCrosswalks(rosettaDocumentId, fromItemId, toDcoumentId);
+
+int counter = 1;
+for(Crosswalk tmpCrosswalk : tmpCrosswalks)
+{
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+    
+    System.out.println("Crosswalk " + counter + ": " + jsonInString);
+    
+    counter++;
+}
+```
+
+
+**PCG Crosswalk a single standard against an entire document with a semantic comparison output**
+
+```java	
+// Init the IMS Global client 
+OpenSALTClient openSaltClient = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+openSaltClient.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+    
+// Init the PCG Crosswalk Service client         
+CrosswalkClient crosswalkClient = new CrosswalkClient(PCG_HOST_DOMAIN, PCG_HOST_PORT, PCG_HOST_SCHEME);
+crosswalkClient.setCredentials(PCG_AUTHENTICATION_URL, PCG_CLIENT_ID, PCG_CLIENT_SECRET, PCG_GRANT_TYPE, PCG_SCOPE);
+
+// Pennsylvania Core English Language Arts CFItem id we'd like to crosswalk from
+String fromItemId = "3feec684-d7cc-11e8-824f-0242ac160002";
+
+// Tennessee Academic Standards: English Language Arts
+String toDcoumentId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
+
+// Pass in a CFItem ID to get the subset of the document
+List<Crosswalk> tmpCrosswalks = openSaltClient.getCFItemCrosswalks(crosswalkClient, fromItemId, toDcoumentId);
 
 int counter = 1;
 for(Crosswalk tmpCrosswalk : tmpCrosswalks)

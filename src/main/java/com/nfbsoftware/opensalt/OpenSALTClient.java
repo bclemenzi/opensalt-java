@@ -2,6 +2,7 @@ package com.nfbsoftware.opensalt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,9 +15,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -33,6 +38,9 @@ import com.nfbsoftware.opensalt.model.CFPackages;
 import com.nfbsoftware.opensalt.model.DestinationNodeURI;
 import com.nfbsoftware.opensalt.model.Documents;
 import com.nfbsoftware.opensalt.model.OriginNodeURI;
+import com.nfbsoftware.pcg.model.ExactMatchOf;
+import com.nfbsoftware.pcg.model.IsRelatedTo;
+import com.nfbsoftware.pcg.model.PCGCrosswalk;
 import com.nfbsoftware.standards.model.Crosswalk;
 import com.nfbsoftware.standards.model.Standard;
 
@@ -50,6 +58,13 @@ public class OpenSALTClient
     
     private int m_hostPort;
     
+    private String m_authenticationUrl;
+    private String m_grantType;
+    private String m_scope;
+    private String m_clientId;
+    private String m_clientSecret;
+    private String m_token;
+    
     /**
      * 
      * @param hostDomain - Base domain for the API host server
@@ -61,6 +76,70 @@ public class OpenSALTClient
         m_hostDomain= hostDomain;
         m_hostPort = hostPort;
         m_hostScheme = hostScheme;
+    }
+    
+    /**
+     * 
+     * @param authenticationUrl - The full url for the oAuth endpoint
+     * @param clientId - The client id issued by the authentication source
+     * @param clientSecret - The client secret issued by the authentication source
+     * @param grantType - Object type we are granting
+     * @param scope - Scope of the authentication
+     * @throws Exception - catch all for exceptions
+     */
+    public void setCredentials(String authenticationUrl, String clientId, String clientSecret, String grantType, String scope) throws Exception
+    {
+        m_authenticationUrl = authenticationUrl;
+        m_clientId = clientId;
+        m_clientSecret = clientSecret;
+        m_grantType = grantType;
+        m_scope = scope;
+        
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        
+        HttpPost postRequest = new HttpPost(m_authenticationUrl);
+        
+        String usernamePassword = m_clientId + ":" + m_clientSecret;
+        String encodedString = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
+        
+        postRequest.setHeader("Authorization", "Basic " + encodedString);
+        postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+        ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
+        postParameters.add(new BasicNameValuePair("grant_type", m_grantType));
+        postParameters.add(new BasicNameValuePair("scope", m_scope));
+        
+        postRequest.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
+        
+        // Get our response from the SALT server
+        HttpResponse saltyResponse = httpClient.execute(postRequest);
+        HttpEntity entity = saltyResponse.getEntity();
+        
+        // If we have an entity, convert it to Java objects
+        if(entity != null) 
+        {
+            String responseString = EntityUtils.toString(entity);   
+            
+            JSONObject responseJSON = new JSONObject(responseString);
+            
+            m_token = StringUtils.stripToEmpty(responseJSON.getString("access_token"));
+            System.out.println("Authenticated Bearer Token: " + m_token);
+        }
+    }
+    
+    /**
+     * <p>This method will use the credentials entered previously to request a new access token</p>
+     * 
+     * @throws Exception - catch all for exceptions
+     */
+    public void refreshAccessToken() throws Exception
+    {
+        // Only refresh the token if we have been granted one in the past.
+        if(m_token != null)
+        {
+            // Refresh the access token
+            setCredentials(m_authenticationUrl, m_clientId, m_clientSecret, m_grantType, m_scope);
+        }
     }
     
     /**
@@ -82,6 +161,12 @@ public class OpenSALTClient
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFDocuments");
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+            getRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
 
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
@@ -134,6 +219,12 @@ public class OpenSALTClient
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFDocuments?limit=" + limit + "&offset=" + offset + "&sort=" + sort + "&orderBy=" + orderBy);
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+            getRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
 
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
@@ -176,6 +267,12 @@ public class OpenSALTClient
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFDocuments/" + sourceId);
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+            getRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
 
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
@@ -216,6 +313,12 @@ public class OpenSALTClient
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFPackages/" + sourceId);
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+            getRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
 
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
@@ -341,6 +444,12 @@ public class OpenSALTClient
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFItems/" + sourceId);
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+            getRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
 
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
@@ -422,6 +531,12 @@ public class OpenSALTClient
         
         // specify the get request
         HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFItemAssociations/" + sourceId);
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+            getRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
 
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
@@ -916,6 +1031,98 @@ public class OpenSALTClient
                     }
                 }
             }
+        }
+        
+        return tmpCrosswalkList;
+    }
+    
+    /**
+     * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
+     * 
+     * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
+     * @param fromCFItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
+     * 
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public List<Crosswalk> getCFItemCrosswalks(CrosswalkClient crosswalkClient, String fromCFItemId, String targetCFDocumentId) throws Exception
+    {
+        List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
+        
+        // Get our target document
+        CFDocument targetDocument = getCFDocument(targetCFDocumentId);
+        
+        // Get our FROM CFItem
+        CFItem fromCFItem = getCFItem(fromCFItemId);
+        
+        // Call our to PCG to get crosswalks
+        PCGCrosswalk tmpPCGCrosswalk = crosswalkClient.crosswalkByIdentifier(fromCFItemId, targetCFDocumentId);
+        
+        for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+        {
+            Crosswalk tmpCrosswalk = new Crosswalk();
+            
+            // Set our target document
+            tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
+            tmpCrosswalk.setCfDocument(targetDocument);
+            
+            // Set our from item
+            tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+            tmpCrosswalk.setFromCFItem(fromCFItem);
+            
+            // Get the item we crosswalked to
+            CFItem toCFItem = getCFItem(tmpExactMatchOf.getIdentifier());
+            
+            tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+            tmpCrosswalk.setToCFItem(toCFItem);
+            
+            // Perform the semantic comparison of text
+            String fromText = fromCFItem.getFullStatement();
+            String toText = toCFItem.getFullStatement();
+            
+            tmpCrosswalk.getAssociationTypes().add("exactMatchOf");
+            tmpCrosswalk.setDocumentAssociationOfToItem("exactMatchOf");
+            
+            // Get the semantic comparison
+            String semanticComparison = generateSemanticComparison(fromText, toText);
+            
+            tmpCrosswalk.setSemanticComparison(semanticComparison);
+            
+            tmpCrosswalkList.add(tmpCrosswalk);
+        }
+        
+        for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+        {
+            Crosswalk tmpCrosswalk = new Crosswalk();
+            
+            // Set our target document
+            tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
+            tmpCrosswalk.setCfDocument(targetDocument);
+            
+            // Set our from item
+            tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+            tmpCrosswalk.setFromCFItem(fromCFItem);
+            
+            // Get the item we crosswalked to
+            CFItem toCFItem = getCFItem(tmpIsRelatedTo.getIdentifier());
+            
+            tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+            tmpCrosswalk.setToCFItem(toCFItem);
+            
+            // Perform the semantic comparison of text
+            String fromText = fromCFItem.getFullStatement();
+            String toText = toCFItem.getFullStatement();
+            
+            tmpCrosswalk.getAssociationTypes().add("isRelatedTo");
+            tmpCrosswalk.setDocumentAssociationOfToItem("isRelatedTo");
+            
+            // Get the semantic comparison
+            String semanticComparison = generateSemanticComparison(fromText, toText);
+            
+            tmpCrosswalk.setSemanticComparison(semanticComparison);
+            
+            tmpCrosswalkList.add(tmpCrosswalk);
         }
         
         return tmpCrosswalkList;
