@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -369,7 +371,9 @@ public class OpenSALTClient
         logger.debug("Getting getTopLevelCFPackageItems " + sourceId);
         
         Set<String> itemIds = new HashSet<String>();
-        List<CFItem> topLevelCfItems = new ArrayList<CFItem>(); 
+
+        // Create a map to store the top level standards of the document by sequence
+        Map<Integer, CFItem> topLevelStandardsMap = new HashMap<Integer, CFItem>();
         
         // Get our full framework package
         CFPackages cfPackages = getCFPackages(sourceId);
@@ -393,7 +397,13 @@ public class OpenSALTClient
                         if(tmpDestinationNodeURI.getIdentifier().equalsIgnoreCase(sourceId) 
                                 && tmpOriginNodeURI.getIdentifier().equalsIgnoreCase(tmpCFItem.getIdentifier()))
                         {
-                            topLevelCfItems.add(tmpCFItem);
+                            Integer sequenceNumber = tmpCFAssociation.getSequenceNumber();
+                            if(sequenceNumber == null)
+                            {
+                                sequenceNumber = new Integer(topLevelStandardsMap.size());
+                            }
+                            
+                            topLevelStandardsMap.put(sequenceNumber, tmpCFItem);
                             itemIds.add(tmpCFItem.getIdentifier());
                             
                             break;
@@ -401,6 +411,15 @@ public class OpenSALTClient
                     }
                 }
             }
+        }
+        
+        // Sort the standards:
+        SortedSet<Integer> sortedTopLevelStandards = new TreeSet<Integer>(topLevelStandardsMap.keySet());
+        
+        List<CFItem> topLevelCfItems = new ArrayList<CFItem>(); 
+        for(Integer key : sortedTopLevelStandards)
+        {
+            topLevelCfItems.add(topLevelStandardsMap.get(key));
         }
         
         return topLevelCfItems;
@@ -596,12 +615,13 @@ public class OpenSALTClient
                 cfItemsMap.put(tmpCFItem.getIdentifier(), tmpCFItem);
             }
             
-            // Create a array to store the top level standards of the document
-            List<Standard> topLevelStandards = new ArrayList<Standard>();
+            // Create a map to store the top level standards of the document by sequence
+            Map<Integer, Standard> topLevelStandardsMap = new HashMap<Integer, Standard>();
             
             // Loop the full set again to get the top level children of the document
             for(CFItem tmpCFItem : cfItems)
             {
+                Integer sequenceNumber = null;
                 boolean isTopLevelItem = false;
                 List<CFAssociation> tmpAssociations = cfPackages.getCFAssociations();
                 for(CFAssociation tmpCFAssociation : tmpAssociations)
@@ -615,6 +635,8 @@ public class OpenSALTClient
                                 && tmpOriginNodeURI.getIdentifier().equalsIgnoreCase(tmpCFItem.getIdentifier()))
                         {
                             isTopLevelItem = true;
+                            
+                            sequenceNumber = tmpCFAssociation.getSequenceNumber();
                             break;
                         }
                     }
@@ -647,9 +669,25 @@ public class OpenSALTClient
                     // Get children of the item
                     getChildAssociations(standardDocument, cfItemsMap, topLevelStandard);
                     
+                    // Check sequence number
+                    if(sequenceNumber == null)
+                    {
+                        sequenceNumber = new Integer(topLevelStandardsMap.size());
+                    }
+                    
                     // Add the standard to the document
-                    topLevelStandards.add(topLevelStandard);
+                    topLevelStandardsMap.put(sequenceNumber, topLevelStandard);
                 }
+            }
+            
+            // Sort the standards:
+            SortedSet<Integer> sortedTopLevelStandards = new TreeSet<Integer>(topLevelStandardsMap.keySet());
+            
+            // Create a array to store the top level standards of the document
+            List<Standard> topLevelStandards = new ArrayList<Standard>();
+            for(Integer key : sortedTopLevelStandards)
+            {
+                topLevelStandards.add(topLevelStandardsMap.get(key));
             }
             
             // Add the top level 
@@ -701,6 +739,9 @@ public class OpenSALTClient
     {
         List<CFAssociation> tmpAssociations = getCFItemAssociations(parentStandard.getId());
         
+        // Create a map to store the top level standards of the document by sequence
+        Map<Integer, Standard> topLevelStandardsMap = new HashMap<Integer, Standard>();
+        
         for(CFAssociation tmpCFAssociation : tmpAssociations)
         {
             if(tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
@@ -741,11 +782,27 @@ public class OpenSALTClient
                         // Check for child documents
                         getChildAssociations(standardDocument, cfItemsMap, childStandard);
                         
-                        // Add the child to the parent standard
-                        parentStandard.getStandards().add(childStandard);
+                        Integer sequenceNumber = tmpCFAssociation.getSequenceNumber();
+                        if(sequenceNumber == null)
+                        {
+                            sequenceNumber = new Integer(topLevelStandardsMap.size());
+                        }
+                        
+                        // Add child to the tree map
+                        topLevelStandardsMap.put(sequenceNumber, childStandard);
                     }
                 }
             }
+        }
+        
+        // Sort the standards:
+        SortedSet<Integer> sortedTopLevelStandards = new TreeSet<Integer>(topLevelStandardsMap.keySet());
+        
+        // Create a array to store the top level standards of the document
+        for(Integer key : sortedTopLevelStandards)
+        {
+            // Add the child to the parent standard
+            parentStandard.getStandards().add(topLevelStandardsMap.get(key));
         }
     }
     
