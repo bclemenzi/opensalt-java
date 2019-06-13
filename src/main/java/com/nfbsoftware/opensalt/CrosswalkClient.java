@@ -101,7 +101,7 @@ public class CrosswalkClient
             JSONObject responseJSON = new JSONObject(responseString);
             
             m_token = StringUtils.stripToEmpty(responseJSON.getString("access_token"));
-            System.out.println("Authenticated Bearer Token: " + m_token);
+            //System.out.println("Authenticated Bearer Token: " + m_token);
         }
     }
     
