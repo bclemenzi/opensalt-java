@@ -170,6 +170,41 @@ public class CaseNetworkClientTest extends TestCase
      * 
      * @throws Exception
      */
+    public void testGetCFDocument() throws Exception
+    {
+        System.out.println("====> Starting CaseNetworkClientTest.testGetCFDocument");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+            
+            CFDocument tmpCFDocument = client.getCFDocument("c664d506-d7cb-11e8-824f-0242ac160002");
+            
+            System.out.println("Identifier: " + tmpCFDocument.getIdentifier());
+            System.out.println("Title: " + tmpCFDocument.getTitle());
+            System.out.println("Description: " + tmpCFDocument.getDescription());
+            System.out.println("Notes: " + tmpCFDocument.getNotes());
+            System.out.println("Creator: " + tmpCFDocument.getCreator());
+            System.out.println("Adoption Status: " + tmpCFDocument.getAdoptionStatus());
+            System.out.println("");
+            
+            assertTrue(tmpCFDocument != null);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(true);
+        }
+        
+        System.out.println("====> Finished CaseNetworkClientTest.testGetCFDocument");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
     public void testItemToDocumentCrosswalks() throws Exception
     {
         System.out.println("====> Starting CaseNetworkClientTest.testItemToDocumentCrosswalks");
