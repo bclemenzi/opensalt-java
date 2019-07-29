@@ -270,6 +270,35 @@ public class OpenSALTClientTest extends TestCase
      * 
      * @throws Exception
      */
+    public void testGetCFItemBreadcrumb() throws Exception
+    {
+        System.out.println("====> Starting OpenSALTClientTest.testGetCFItemBreadcrumb");
+        
+        try
+        {
+            OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            String breadcrumbTrail = client.getItemBreadcrumbTrail("5ad1a3fe-f280-11e8-9cff-0242ac140002");
+            
+            System.out.println("breadcrumbTrail:");
+            System.out.println(breadcrumbTrail);
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished OpenSALTClientTest.testGetCFItemBreadcrumb");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
     public void testGetCFItemAssociations() throws Exception
     {
         System.out.println("====> Starting OpenSALTClientTest.testGetCFItemAssociations");

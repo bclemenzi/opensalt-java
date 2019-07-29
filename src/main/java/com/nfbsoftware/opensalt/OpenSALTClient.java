@@ -506,21 +506,24 @@ public class OpenSALTClient
         {
             List<CFAssociation> associations = getCFItemAssociations(sourceId);
             
-            for(CFAssociation tmpCFAssociation : associations)
+            if(associations != null)
             {
-                if(tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
+                for(CFAssociation tmpCFAssociation : associations)
                 {
-                    DestinationNodeURI destinationNodeURI = tmpCFAssociation.getDestinationNodeURI();
-                    
-                    if(destinationNodeURI != null)
+                    if(tmpCFAssociation.getAssociationType().equalsIgnoreCase("isChildOf"))
                     {
-                        String parentItemId = destinationNodeURI.getIdentifier();
+                        DestinationNodeURI destinationNodeURI = tmpCFAssociation.getDestinationNodeURI();
                         
-                        if(!parentItemId.equalsIgnoreCase(sourceId))
+                        if(destinationNodeURI != null)
                         {
-                            cfItemParent = getCFItem(parentItemId);
+                            String parentItemId = destinationNodeURI.getIdentifier();
                             
-                            break;
+                            if(!parentItemId.equalsIgnoreCase(sourceId))
+                            {
+                                cfItemParent = getCFItem(parentItemId);
+                                
+                                break;
+                            }
                         }
                     }
                 }
@@ -1183,6 +1186,67 @@ public class OpenSALTClient
         }
         
         return tmpCrosswalkList;
+    }
+    
+    /**
+     * 
+     * @param cfItemId
+     * @return
+     * @throws Exception
+     */
+    public String getItemBreadcrumbTrail(String cfItemId) throws Exception
+    {
+        StringBuffer breadcrumbTrail = new StringBuffer();
+        
+        List<String> breadcrumbItems = new ArrayList<String>();
+        
+        // Populate our breadcrumb array
+        getParentBreadcrumbs(cfItemId, breadcrumbItems);
+        
+        // Look through the array backwards to create the trail
+        for (int i = breadcrumbItems.size(); i > 0; i--)
+        {
+            String tempItem = breadcrumbItems.get(i-1);
+            
+            if(!StringUtils.isEmpty(tempItem))
+            {
+                breadcrumbTrail.append(tempItem);
+                
+                if(i != 1)
+                {
+                    breadcrumbTrail.append(" > ");
+                }
+            }
+        }
+        
+        return breadcrumbTrail.toString();
+    }
+
+    /**
+     * 
+     * @param cfItemId
+     * @param breadcrumbItems
+     * @throws Exception
+     */
+    private void getParentBreadcrumbs(String cfItemId, List<String> breadcrumbItems) throws Exception
+    {
+        CFItem parentItem = getCFItemParent(cfItemId);
+        
+        if(parentItem != null)
+        {
+            String tmpHumanCodingScheme = StringUtils.stripToEmpty(parentItem.getHumanCodingScheme());
+            String tmpFullStatement = StringUtils.stripToEmpty(parentItem.getFullStatement());
+            
+            if(!StringUtils.isEmpty(tmpHumanCodingScheme))
+            {
+                tmpFullStatement = tmpHumanCodingScheme;
+            }
+            
+            breadcrumbItems.add(StringUtils.stripToEmpty(tmpFullStatement));
+            
+            // Loop through to the next parent up the tree
+            getParentBreadcrumbs(parentItem.getIdentifier(), breadcrumbItems);
+        }
     }
 
     /**
