@@ -1119,70 +1119,77 @@ public class OpenSALTClient
         // Call our to PCG to get crosswalks
         PCGCrosswalk tmpPCGCrosswalk = crosswalkClient.crosswalkByIdentifier(fromCFItemId, targetCFDocumentId);
         
-        for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+        if(tmpPCGCrosswalk != null)
         {
-            Crosswalk tmpCrosswalk = new Crosswalk();
+            for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+            {
+                Crosswalk tmpCrosswalk = new Crosswalk();
+                
+                // Set our target document
+                tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
+                tmpCrosswalk.setCfDocument(targetDocument);
+                
+                // Set our from item
+                tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+                tmpCrosswalk.setFromCFItem(fromCFItem);
+                
+                // Get the item we crosswalked to
+                CFItem toCFItem = getCFItem(tmpExactMatchOf.getIdentifier());
+                
+                tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+                tmpCrosswalk.setToCFItem(toCFItem);
+                
+                // Perform the semantic comparison of text
+                String fromText = fromCFItem.getFullStatement();
+                String toText = toCFItem.getFullStatement();
+                
+                tmpCrosswalk.getAssociationTypes().add("exactMatchOf");
+                tmpCrosswalk.setDocumentAssociationOfToItem("exactMatchOf");
+                
+                // Get the semantic comparison
+                String semanticComparison = generateSemanticComparison(fromText, toText);
+                
+                tmpCrosswalk.setSemanticComparison(semanticComparison);
+                
+                tmpCrosswalkList.add(tmpCrosswalk);
+            }
             
-            // Set our target document
-            tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
-            tmpCrosswalk.setCfDocument(targetDocument);
-            
-            // Set our from item
-            tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
-            tmpCrosswalk.setFromCFItem(fromCFItem);
-            
-            // Get the item we crosswalked to
-            CFItem toCFItem = getCFItem(tmpExactMatchOf.getIdentifier());
-            
-            tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
-            tmpCrosswalk.setToCFItem(toCFItem);
-            
-            // Perform the semantic comparison of text
-            String fromText = fromCFItem.getFullStatement();
-            String toText = toCFItem.getFullStatement();
-            
-            tmpCrosswalk.getAssociationTypes().add("exactMatchOf");
-            tmpCrosswalk.setDocumentAssociationOfToItem("exactMatchOf");
-            
-            // Get the semantic comparison
-            String semanticComparison = generateSemanticComparison(fromText, toText);
-            
-            tmpCrosswalk.setSemanticComparison(semanticComparison);
-            
-            tmpCrosswalkList.add(tmpCrosswalk);
+            for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+            {
+                Crosswalk tmpCrosswalk = new Crosswalk();
+                
+                // Set our target document
+                tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
+                tmpCrosswalk.setCfDocument(targetDocument);
+                
+                // Set our from item
+                tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+                tmpCrosswalk.setFromCFItem(fromCFItem);
+                
+                // Get the item we crosswalked to
+                CFItem toCFItem = getCFItem(tmpIsRelatedTo.getIdentifier());
+                
+                tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+                tmpCrosswalk.setToCFItem(toCFItem);
+                
+                // Perform the semantic comparison of text
+                String fromText = fromCFItem.getFullStatement();
+                String toText = toCFItem.getFullStatement();
+                
+                tmpCrosswalk.getAssociationTypes().add("isRelatedTo");
+                tmpCrosswalk.setDocumentAssociationOfToItem("isRelatedTo");
+                
+                // Get the semantic comparison
+                String semanticComparison = generateSemanticComparison(fromText, toText);
+                
+                tmpCrosswalk.setSemanticComparison(semanticComparison);
+                
+                tmpCrosswalkList.add(tmpCrosswalk);
+            }
         }
-        
-        for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+        else
         {
-            Crosswalk tmpCrosswalk = new Crosswalk();
-            
-            // Set our target document
-            tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
-            tmpCrosswalk.setCfDocument(targetDocument);
-            
-            // Set our from item
-            tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
-            tmpCrosswalk.setFromCFItem(fromCFItem);
-            
-            // Get the item we crosswalked to
-            CFItem toCFItem = getCFItem(tmpIsRelatedTo.getIdentifier());
-            
-            tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
-            tmpCrosswalk.setToCFItem(toCFItem);
-            
-            // Perform the semantic comparison of text
-            String fromText = fromCFItem.getFullStatement();
-            String toText = toCFItem.getFullStatement();
-            
-            tmpCrosswalk.getAssociationTypes().add("isRelatedTo");
-            tmpCrosswalk.setDocumentAssociationOfToItem("isRelatedTo");
-            
-            // Get the semantic comparison
-            String semanticComparison = generateSemanticComparison(fromText, toText);
-            
-            tmpCrosswalk.setSemanticComparison(semanticComparison);
-            
-            tmpCrosswalkList.add(tmpCrosswalk);
+            logger.error("No PCG crosswalk data found, null pointer, for target document: " + targetDocument.getTitle() + " (" + targetDocument.getIdentifier() + ")");
         }
         
         return tmpCrosswalkList;
