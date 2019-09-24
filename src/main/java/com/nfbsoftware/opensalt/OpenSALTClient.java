@@ -1199,7 +1199,7 @@ public class OpenSALTClient
      * 
      * @param cfItemId - The GUID that identifies the CFItem in a CFDocument.
      * @return A string representing the breadcrumb trail.
-     * @throws Exception
+     * @throws Exception - catch all for exceptions
      */
     public String getItemBreadcrumbTrail(String cfItemId) throws Exception
     {
@@ -1233,7 +1233,7 @@ public class OpenSALTClient
      * 
      * @param cfItemId - The GUID that identifies the CFItem in a CFDocument.
      * @param breadcrumbItems A list representing the breadcrumb trail.
-     * @throws Exception
+     * @throws Exception - catch all for exceptions
      */
     private void getParentBreadcrumbs(String cfItemId, List<String> breadcrumbItems) throws Exception
     {
@@ -1263,7 +1263,7 @@ public class OpenSALTClient
      * @param toText - Comparison text
      * @return - returns the semantic comparison text
      * 
-     * @throws DiffException
+     * @throws DiffException - catch all for exceptions
      */
     private String generateSemanticComparison(String fromText, String toText) throws DiffException
     {
