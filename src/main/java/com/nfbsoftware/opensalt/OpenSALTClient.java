@@ -1197,8 +1197,8 @@ public class OpenSALTClient
     
     /**
      * 
-     * @param cfItemId
-     * @return
+     * @param cfItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @return A string representing the breadcrumb trail.
      * @throws Exception
      */
     public String getItemBreadcrumbTrail(String cfItemId) throws Exception
@@ -1231,8 +1231,8 @@ public class OpenSALTClient
 
     /**
      * 
-     * @param cfItemId
-     * @param breadcrumbItems
+     * @param cfItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @param breadcrumbItems A list representing the breadcrumb trail.
      * @throws Exception
      */
     private void getParentBreadcrumbs(String cfItemId, List<String> breadcrumbItems) throws Exception
