@@ -159,6 +159,7 @@ public class CrosswalkClient
             
             JSONObject responseJSON = new JSONObject(responseString);
             //System.out.println(responseJSON.toString());
+            logger.debug("Crosswalk/by-identifier Response (" + identifier + " to " + target + "): " + responseJSON.toString());
             
             ObjectMapper mapper = new ObjectMapper();
             tmpPCGCrosswalk = mapper.readValue(responseJSON.toString(),  PCGCrosswalk.class);
@@ -207,6 +208,7 @@ public class CrosswalkClient
             
             JSONObject responseJSON = new JSONObject(responseString);
             //System.out.println(responseJSON.toString());
+            logger.debug("Crosswalk/by-hcs Response (" + source + " -  " + hcs + " - " + target + "): " + responseJSON.toString());
             
             ObjectMapper mapper = new ObjectMapper();
             tmpPCGCrosswalk = mapper.readValue(responseJSON.toString(),  PCGCrosswalk.class);
