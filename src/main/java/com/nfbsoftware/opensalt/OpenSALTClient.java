@@ -1228,6 +1228,48 @@ public class OpenSALTClient
         
         return breadcrumbTrail.toString();
     }
+    
+    /**
+     * 
+     * @param cfItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @return A CFItem of the ultimate parent
+     * @throws Exception - catch all for exceptions
+     */
+    public CFItem getUltimateParentItem(String cfItemId) throws Exception
+    {
+        List<CFItem> parentItems = new ArrayList<CFItem>();
+        
+        // Populate our breadcrumb array
+        getParentItems(cfItemId, parentItems);
+        
+        if(parentItems.size() > 0)
+        {
+            return parentItems.get(parentItems.size()-1);
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    /**
+     * 
+     * @param cfItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @param breadcrumbItems A list representing the breadcrumb trail.
+     * @throws Exception - catch all for exceptions
+     */
+    private void getParentItems(String cfItemId, List<CFItem> parentItems) throws Exception
+    {
+        CFItem parentItem = getCFItemParent(cfItemId);
+        
+        if(parentItem != null)
+        {
+            parentItems.add(parentItem);
+            
+            // Loop through to the next parent up the tree
+            getParentItems(parentItem.getIdentifier(), parentItems);
+        }
+    }
 
     /**
      * 
