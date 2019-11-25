@@ -1100,7 +1100,7 @@ public class OpenSALTClient
      * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
      * 
      * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
-     * @param fromCFItem - The CFItem in a CFDocument.
+     * @param fromCFItemId - The CFItem in a CFDocument.
      * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
      * 
      * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
@@ -1117,7 +1117,7 @@ public class OpenSALTClient
      * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
      * 
      * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
-     * @param fromCFItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @param fromCFItem - The GUID that identifies the CFItem in a CFDocument.
      * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
      * 
      * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
@@ -1239,8 +1239,6 @@ public class OpenSALTClient
     public Map<String, List<Crosswalk>> getCFItemCrosswalks(CrosswalkClient crosswalkClient, List<CFItem> fromCFItems, String targetCFDocumentId) throws Exception
     {
     	Map<String, List<Crosswalk>> tmpCrosswalkMap = new HashMap<String, List<Crosswalk>>();
-    	
-        List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
         
         // Get our target document
         CFDocument targetDocument = getCFDocument(targetCFDocumentId);
@@ -1260,6 +1258,8 @@ public class OpenSALTClient
         
         for(String fromIdKey : tmpPCGCrosswalks.keySet())
         {
+        	List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
+        	
 	        // Get our FROM CFItem within our cached map
 	        CFItem fromCFItem = fromItemMap.get(fromIdKey);
 	        
