@@ -2,6 +2,10 @@ package com.nfbsoftware.opensalt;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -14,6 +18,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -215,5 +220,75 @@ public class CrosswalkClient
         }
         
         return tmpPCGCrosswalk;
+    }
+    
+    /**
+     * <p>Gets item matches in the target framework of an item identified by identifier.</p>
+     * 
+     * @param identifier - The identifier of the item to match
+     * @param target - The identifier of the target framework
+     * @return An instance of PCGCrosswalk
+     * @throws Exception - catch all for exceptions
+     */
+    public Map<String, PCGCrosswalk> crosswalkByIdentifiers(List<String> identifiers, String target) throws Exception
+    {
+    	Map<String, PCGCrosswalk> tmpPCGCrosswalks = new HashMap<String, PCGCrosswalk>();
+        
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        
+        // specify the host, protocol, and port
+        HttpHost targetHost = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
+        
+        logger.debug("Getting crosswalk by identifiers");
+        
+        // specify the get request
+        HttpPost postRequest = new HttpPost("/api/v1/crosswalk/to-framework/" + target);
+        
+        // Add the bearer token if we have one
+        if(m_token != null)
+        {
+        	postRequest.setHeader("Authorization", "Bearer " + m_token);
+        }
+        
+        JSONObject postBodyJSON = new JSONObject();
+        postBodyJSON.append("identifiers", identifiers);
+        
+        // TODO Fix this garbage logic
+        String tmpBody = StringUtils.replace(postBodyJSON.toString(), "[[", "[");
+        tmpBody = StringUtils.replace(tmpBody, "]]", "]");
+        
+        HttpEntity postBody = new ByteArrayEntity(tmpBody.getBytes("UTF-8"));
+        
+        // Set the body of the post
+        postRequest.setEntity(postBody);
+
+        // Get our response from the SALT server
+        HttpResponse saltyResponse = httpClient.execute(targetHost, postRequest);
+        HttpEntity entity = saltyResponse.getEntity();
+        
+        // If we have an entity, convert it to Java objects
+        if(entity != null) 
+        {
+            String responseString = EntityUtils.toString(entity);   
+            
+            JSONObject responseJSON = new JSONObject(responseString);
+            //System.out.println(responseJSON.toString());
+            logger.debug("Crosswalk/to-framework Response (" + target + "): " + responseJSON.toString());
+            
+            Set<String> identifierKeys = responseJSON.keySet();
+            
+            ObjectMapper mapper = new ObjectMapper();
+            for(String key : identifierKeys)
+            {
+            	PCGCrosswalk tmpPCGCrosswalk = mapper.readValue(responseJSON.get(key).toString(),  PCGCrosswalk.class);
+            
+            	if(tmpPCGCrosswalk != null)
+                {
+            		tmpPCGCrosswalks.put(key, tmpPCGCrosswalk);
+                }
+            }
+        }
+        
+        return tmpPCGCrosswalks;
     }
 }

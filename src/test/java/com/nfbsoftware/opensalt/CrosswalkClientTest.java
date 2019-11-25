@@ -1,5 +1,9 @@
 package com.nfbsoftware.opensalt;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.nfbsoftware.pcg.model.ExactMatchOf;
 import com.nfbsoftware.pcg.model.IsRelatedTo;
 import com.nfbsoftware.pcg.model.PCGCrosswalk;
@@ -79,5 +83,61 @@ public class CrosswalkClientTest extends TestCase
         }
         
         System.out.println("====> Finished CrosswalkClientTest.testAuthentication");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testCrosswalkToFramework() throws Exception
+    {
+        System.out.println("====> Starting CrosswalkClientTest.testCrosswalkToFramework");
+        
+        try
+        {
+            CrosswalkClient client = new CrosswalkClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            
+            client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+            
+            List<String> identifiers = new ArrayList<String>();
+            identifiers.add("6b341e9e-d7cc-11e8-824f-0242ac160002");
+            identifiers.add("6b370e84-d7cc-11e8-824f-0242ac160002");
+            identifiers.add("6b38c894-d7cc-11e8-824f-0242ac160002");
+            
+            Map<String, PCGCrosswalk> tmpPCGCrosswalks = client.crosswalkByIdentifiers(identifiers, "c607fa0c-d7cb-11e8-824f-0242ac160002");
+            
+            int counter = 0;
+            for(String identifierId : tmpPCGCrosswalks.keySet())
+            {
+            	PCGCrosswalk tmpPCGCrosswalk = tmpPCGCrosswalks.get(identifierId);
+            	
+            	if(tmpPCGCrosswalk != null)
+            	{
+	                for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+	                {
+	                    System.out.println(counter + ": ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
+	                }
+	                
+	                for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+	                {
+	                    System.out.println(counter + ": IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
+	                }
+	                
+	                counter++;
+            	}
+            }
+            
+
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(true);
+        }
+        
+        System.out.println("====> Finished CrosswalkClientTest.testCrosswalkToFramework");
     }
 }

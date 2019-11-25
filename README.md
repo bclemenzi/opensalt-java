@@ -27,7 +27,7 @@ The easiest way to incorporate the library into your Java project is to use Mave
 <dependency>
    <groupId>com.nfbsoftware</groupId>
    <artifactId>opensalt-java</artifactId>
-   <version>1.0.28</version>
+   <version>1.0.29</version>
 </dependency>
 ```
 Usage
@@ -285,19 +285,65 @@ crosswalkClient.setCredentials(PCG_AUTHENTICATION_URL, PCG_CLIENT_ID, PCG_CLIENT
 String fromItemId = "3feec684-d7cc-11e8-824f-0242ac160002";
 
 // Tennessee Academic Standards: English Language Arts
-String toDcoumentId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
+String toDocumentId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
 
-// Pass in a CFItem ID to get the subset of the document
-List<Crosswalk> tmpCrosswalks = openSaltClient.getCFItemCrosswalks(crosswalkClient, fromItemId, toDcoumentId);
+PCGCrosswalk tmpPCGCrosswalk = client.crosswalkByIdentifier(fromItemId, toDocumentId);
 
-int counter = 1;
-for(Crosswalk tmpCrosswalk : tmpCrosswalks)
+if(tmpPCGCrosswalk != null)
 {
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonInString = mapper.writeValueAsString(tmpCrosswalk);
+	for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+	{
+	    System.out.println("ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
+	}
+	
+	for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+	{
+	    System.out.println("IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
+	}
+}
+```
+
+**PCG Crosswalk a List of standards against an entire document with a semantic comparison output**
+
+```java	
+// Init the IMS Global client 
+OpenSALTClient openSaltClient = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+openSaltClient.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     
-    System.out.println("Crosswalk " + counter + ": " + jsonInString);
-    
-    counter++;
+// Init the PCG Crosswalk Service client         
+CrosswalkClient client = new CrosswalkClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+
+// Tennessee Academic Standards: English Language Arts
+String toDocumentId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
+
+// List of Common Core standard identifiers
+List<String> identifiers = new ArrayList<String>();
+identifiers.add("6b341e9e-d7cc-11e8-824f-0242ac160002");
+identifiers.add("6b370e84-d7cc-11e8-824f-0242ac160002");
+identifiers.add("6b38c894-d7cc-11e8-824f-0242ac160002");
+
+// Pass in a List identifiers to crosswalk against the TO document framework
+Map<String, PCGCrosswalk> tmpCrosswalks = client.crosswalkByIdentifiers(identifiers, "c607fa0c-d7cb-11e8-824f-0242ac160002");
+
+int counter = 0;
+for(String identifierId : tmpPCGCrosswalks.keySet())
+{
+	PCGCrosswalk tmpPCGCrosswalk = tmpPCGCrosswalks.get(identifierId);
+	
+	if(tmpPCGCrosswalk != null)
+	{
+        for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+        {
+            System.out.println(counter + ": ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
+        }
+        
+        for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+        {
+            System.out.println(counter + ": IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
+        }
+        
+        counter++;
+	}
 }
 ```
