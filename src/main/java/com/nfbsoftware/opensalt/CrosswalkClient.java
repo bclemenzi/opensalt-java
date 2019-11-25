@@ -225,7 +225,7 @@ public class CrosswalkClient
     /**
      * <p>Gets item matches in the target framework of an item identified by identifier.</p>
      * 
-     * @param identifier - The identifier of the item to match
+     * @param identifiers - The identifier of the item to match
      * @param target - The identifier of the target framework
      * @return An instance of PCGCrosswalk
      * @throws Exception - catch all for exceptions
