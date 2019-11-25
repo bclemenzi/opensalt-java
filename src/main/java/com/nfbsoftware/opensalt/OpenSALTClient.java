@@ -1100,7 +1100,7 @@ public class OpenSALTClient
      * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
      * 
      * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
-     * @param fromCFItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @param fromCFItem - The CFItem in a CFDocument.
      * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
      * 
      * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
@@ -1108,16 +1108,30 @@ public class OpenSALTClient
      */
     public List<Crosswalk> getCFItemCrosswalks(CrosswalkClient crosswalkClient, String fromCFItemId, String targetCFDocumentId) throws Exception
     {
+    	CFItem fromCFItem = getCFItem(fromCFItemId);
+    	
+    	return getCFItemCrosswalks(crosswalkClient, fromCFItem, targetCFDocumentId);
+    }
+    
+    /**
+     * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
+     * 
+     * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
+     * @param fromCFItemId - The GUID that identifies the CFItem in a CFDocument.
+     * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
+     * 
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public List<Crosswalk> getCFItemCrosswalks(CrosswalkClient crosswalkClient, CFItem fromCFItem, String targetCFDocumentId) throws Exception
+    {
         List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
         
         // Get our target document
         CFDocument targetDocument = getCFDocument(targetCFDocumentId);
         
-        // Get our FROM CFItem
-        CFItem fromCFItem = getCFItem(fromCFItemId);
-        
         // Call our to PCG to get crosswalks
-        PCGCrosswalk tmpPCGCrosswalk = crosswalkClient.crosswalkByIdentifier(fromCFItemId, targetCFDocumentId);
+        PCGCrosswalk tmpPCGCrosswalk = crosswalkClient.crosswalkByIdentifier(fromCFItem.getIdentifier(), targetCFDocumentId);
         
         if(tmpPCGCrosswalk != null)
         {
@@ -1193,6 +1207,143 @@ public class OpenSALTClient
         }
         
         return tmpCrosswalkList;
+    }
+    
+    /**
+     * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
+     * 
+     * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
+     * @param fromCFItemIds - List of GUIDs that identify the CFItems in a CFDocument.
+     * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
+     * 
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public Map<String, List<Crosswalk>> getCFItemCrosswalksByIds(CrosswalkClient crosswalkClient, List<String> fromCFItemIds, String targetCFDocumentId) throws Exception
+    {
+    	List<CFItem> fromCFItems = new ArrayList<CFItem>();
+    	
+    	return getCFItemCrosswalks(crosswalkClient, fromCFItems, targetCFDocumentId);
+    }
+    
+    /**
+     * <p>Returns a crosswalk list that contains the semantic comparisons of a CFItem in a another CFDocument</p>
+     * 
+     * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
+     * @param fromCFItems - List of CFItems in a CFDocument.
+     * @param targetCFDocumentId - The GUID that identifies the target CFDocument.
+     * 
+     * @return A crosswalk object that contains the semantic comparison between the two CFItems using markdown style
+     * @throws Exception - catch all for exceptions
+     */
+    public Map<String, List<Crosswalk>> getCFItemCrosswalks(CrosswalkClient crosswalkClient, List<CFItem> fromCFItems, String targetCFDocumentId) throws Exception
+    {
+    	Map<String, List<Crosswalk>> tmpCrosswalkMap = new HashMap<String, List<Crosswalk>>();
+    	
+        List<Crosswalk> tmpCrosswalkList = new ArrayList<Crosswalk>();
+        
+        // Get our target document
+        CFDocument targetDocument = getCFDocument(targetCFDocumentId);
+        
+        // Create fromItemMap
+        List<String> fromCFItemIds = new ArrayList<String>();
+        Map<String, CFItem> fromItemMap = new HashMap<String, CFItem>();
+        
+        for(CFItem tmpCFItem : fromCFItems)
+        {
+        	fromCFItemIds.add(tmpCFItem.getIdentifier());
+        	fromItemMap.put(tmpCFItem.getIdentifier(), tmpCFItem);
+        }
+        
+        // Get all the crosswalks
+        Map<String, PCGCrosswalk> tmpPCGCrosswalks = crosswalkClient.crosswalkByIdentifiers(fromCFItemIds, targetCFDocumentId);
+        
+        for(String fromIdKey : tmpPCGCrosswalks.keySet())
+        {
+	        // Get our FROM CFItem within our cached map
+	        CFItem fromCFItem = fromItemMap.get(fromIdKey);
+	        
+	        // Call our to PCG to get crosswalks
+	        PCGCrosswalk tmpPCGCrosswalk = tmpPCGCrosswalks.get(fromIdKey);
+	        
+	        if(tmpPCGCrosswalk != null)
+	        {
+	            for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+	            {
+	                Crosswalk tmpCrosswalk = new Crosswalk();
+	                
+	                // Set our target document
+	                tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
+	                tmpCrosswalk.setCfDocument(targetDocument);
+	                
+	                // Set our from item
+	                tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+	                tmpCrosswalk.setFromCFItem(fromCFItem);
+	                
+	                // Get the item we crosswalked to
+	                CFItem toCFItem = getCFItem(tmpExactMatchOf.getIdentifier());
+	                
+	                tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+	                tmpCrosswalk.setToCFItem(toCFItem);
+	                
+	                // Perform the semantic comparison of text
+	                String fromText = fromCFItem.getFullStatement();
+	                String toText = toCFItem.getFullStatement();
+	                
+	                tmpCrosswalk.getAssociationTypes().add("exactMatchOf");
+	                tmpCrosswalk.setDocumentAssociationOfToItem("exactMatchOf");
+	                
+	                // Get the semantic comparison
+	                String semanticComparison = generateSemanticComparison(fromText, toText);
+	                
+	                tmpCrosswalk.setSemanticComparison(semanticComparison);
+	                
+	                tmpCrosswalkList.add(tmpCrosswalk);
+	            }
+	            
+	            for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+	            {
+	                Crosswalk tmpCrosswalk = new Crosswalk();
+	                
+	                // Set our target document
+	                tmpCrosswalk.setCfDocumentId(targetCFDocumentId);
+	                tmpCrosswalk.setCfDocument(targetDocument);
+	                
+	                // Set our from item
+	                tmpCrosswalk.setFromCFItemId(fromCFItem.getIdentifier());
+	                tmpCrosswalk.setFromCFItem(fromCFItem);
+	                
+	                // Get the item we crosswalked to
+	                CFItem toCFItem = getCFItem(tmpIsRelatedTo.getIdentifier());
+	                
+	                tmpCrosswalk.setToCFItemId(toCFItem.getIdentifier());
+	                tmpCrosswalk.setToCFItem(toCFItem);
+	                
+	                // Perform the semantic comparison of text
+	                String fromText = fromCFItem.getFullStatement();
+	                String toText = toCFItem.getFullStatement();
+	                
+	                tmpCrosswalk.getAssociationTypes().add("isRelatedTo");
+	                tmpCrosswalk.setDocumentAssociationOfToItem("isRelatedTo");
+	                
+	                // Get the semantic comparison
+	                String semanticComparison = generateSemanticComparison(fromText, toText);
+	                
+	                tmpCrosswalk.setSemanticComparison(semanticComparison);
+	                
+	                tmpCrosswalkList.add(tmpCrosswalk);
+	            }
+	        }
+	        else
+	        {
+	            logger.error("No PCG crosswalk data found, null pointer, for target document: " + targetDocument.getTitle() + " (" + targetDocument.getIdentifier() + ")");
+	        }
+	        
+	        // Add the overall crosswalk to the map
+	        tmpCrosswalkMap.put(fromIdKey, tmpCrosswalkList);
+        }
+        
+        return tmpCrosswalkMap;
     }
     
     /**
@@ -1307,7 +1458,7 @@ public class OpenSALTClient
      * 
      * @throws DiffException - catch all for exceptions
      */
-    private String generateSemanticComparison(String fromText, String toText) throws DiffException
+    public String generateSemanticComparison(String fromText, String toText) throws DiffException
     {
         String semanticComparison = "";
         
