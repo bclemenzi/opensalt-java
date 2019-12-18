@@ -590,13 +590,13 @@ public class OpenSALTClient
      */
     public Standard getFullHierarchicalStandard(CrosswalkClient crosswalkClient, String sourceId) throws Exception
     {
-    	Standard standardDocument = null;
+    	Standard fullStandardDocument = null;
     	
         CFDocument tmpCFDocument = getCFDocument(sourceId);
         
         if(tmpCFDocument.getIdentifier() != null)
         {
-        	standardDocument = crosswalkClient.getEvotextHierarchyFramework(sourceId);
+        	fullStandardDocument = crosswalkClient.getEvotextHierarchyFramework(sourceId);
         }
         else
         {
@@ -605,28 +605,13 @@ public class OpenSALTClient
             
             if(tempCFItem != null)
             {
-            	standardDocument = crosswalkClient.getEvotextHierarchyFramework(tempCFItem.getCFDocumentURI().getIdentifier());
+            	Standard tmpStandardDocument = crosswalkClient.getEvotextHierarchyFramework(tempCFItem.getCFDocumentURI().getIdentifier());
             	
-        		for(Standard tmpStandard : standardDocument.getStandards())
-        		{
-        			if(tmpStandard.getId().equalsIgnoreCase(sourceId))
-        			{
-        				standardDocument = tmpStandard;
-        			}
-        			else
-        			{
-        				standardDocument = checkTheChildren(sourceId, tmpStandard);
-        			}
-        			
-        			if(standardDocument != null)
-        			{
-        				break;
-        			}
-        		}
+            	fullStandardDocument = checkTheChildren(sourceId, tmpStandardDocument, fullStandardDocument);
             }
         }
     	
-    	return standardDocument;
+    	return fullStandardDocument;
     }
     
     /**
@@ -1532,27 +1517,30 @@ public class OpenSALTClient
      * 
      * @param sourceId
      * @param standardDocument
-     * @return
+     * @param fullStandardDocument
+     * @return - returns Standard opbject
      */
-	private Standard checkTheChildren(String sourceId, Standard standardDocument)
+	private Standard checkTheChildren(String sourceId, Standard standardDocument, Standard fullStandardDocument)
 	{
 		for(Standard tmpStandard : standardDocument.getStandards())
 		{
+			System.out.println(tmpStandard.getHumanCodingScheme() + " - " + tmpStandard.getFullStatement());
+			
 			if(tmpStandard.getId().equalsIgnoreCase(sourceId))
 			{
-				standardDocument = tmpStandard;
+				fullStandardDocument = tmpStandard;
 			}
 			else
 			{
-				standardDocument = checkTheChildren(sourceId, tmpStandard);
+				fullStandardDocument = checkTheChildren(sourceId, tmpStandard, fullStandardDocument);
 			}
 			
-			if(standardDocument != null)
+			if(fullStandardDocument != null)
 			{
 				break;
 			}
 		}
 		
-		return standardDocument;
+		return fullStandardDocument;
 	}
 }

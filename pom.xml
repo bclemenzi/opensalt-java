@@ -4,7 +4,7 @@
 
   	<groupId>com.nfbsoftware</groupId>
   	<artifactId>opensalt-java</artifactId>
-  	<version>1.0.32</version>
+  	<version>1.0.34</version>
   	<packaging>jar</packaging>
 
   	<name>OpenSALT Java Library</name>
