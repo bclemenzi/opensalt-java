@@ -1524,7 +1524,7 @@ public class OpenSALTClient
 	{
 		for(Standard tmpStandard : standardDocument.getStandards())
 		{
-			System.out.println(tmpStandard.getHumanCodingScheme() + " - " + tmpStandard.getFullStatement());
+			//System.out.println(tmpStandard.getHumanCodingScheme() + " - " + tmpStandard.getFullStatement());
 			
 			if(tmpStandard.getId().equalsIgnoreCase(sourceId))
 			{
