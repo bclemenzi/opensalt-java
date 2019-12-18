@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfbsoftware.opensalt.model.CFDocument;
 import com.nfbsoftware.standards.model.Crosswalk;
+import com.nfbsoftware.standards.model.Standard;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -257,5 +258,58 @@ public class CaseNetworkClientTest extends TestCase
         }
         
         System.out.println("====> Finished CaseNetworkClientTest.testItemToDocumentCrosswalks");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testFullHierarchicalStandard() throws Exception
+    {
+        System.out.println("====> Starting CaseNetworkClientTest.testFullHierarchicalStandard");
+        
+        try
+        {
+            OpenSALTClient openSaltClient = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            openSaltClient.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+            
+            CrosswalkClient crosswalkClient = new CrosswalkClient(PCG_HOST_DOMAIN, PCG_HOST_PORT, PCG_HOST_SCHEME);
+            crosswalkClient.setCredentials(PCG_AUTHENTICATION_URL, PCG_CLIENT_ID, PCG_CLIENT_SECRET, PCG_GRANT_TYPE, PCG_SCOPE);
+            
+            Long startTime = (new Date()).getTime();
+            System.out.println(startTime);
+            
+            // Pennsylvania Core English Language Arts CFItem id we'd like to crosswalk from
+            //String sourceId = "3feec684-d7cc-11e8-824f-0242ac160002";
+            
+            // Tennessee Academic Standards: English Language Arts
+            String sourceId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
+            
+            // Pass in a CFItem ID to get the subset of the document
+            Standard tmpStandard = openSaltClient.getFullHierarchicalStandard(crosswalkClient, sourceId);
+            
+            if(tmpStandard != null)
+            {
+            	ObjectMapper mapper = new ObjectMapper();
+                String jsonInString = mapper.writeValueAsString(tmpStandard);
+                
+                System.out.println("tmpStandard: " + jsonInString);
+            }
+            
+            Long finishTime = (new Date()).getTime();
+            System.out.println(finishTime);
+            
+            System.out.println("Test TAT: " + (finishTime - startTime));
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(true);
+        }
+        
+        System.out.println("====> Finished CaseNetworkClientTest.testFullHierarchicalStandard");
     }
 }

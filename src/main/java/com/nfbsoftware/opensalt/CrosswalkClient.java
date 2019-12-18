@@ -1,5 +1,6 @@
 package com.nfbsoftware.opensalt;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -24,8 +26,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfbsoftware.pcg.model.PCGCrosswalk;
+import com.nfbsoftware.standards.model.Standard;
 
 /**
  * This is a Java utility class that is used to communicate with the Academic Benchmarks' RESTful API.
@@ -291,4 +296,56 @@ public class CrosswalkClient
         
         return tmpPCGCrosswalks;
     }
+
+    /**
+     * 
+     * @param sourceId
+     * @return
+     * @throws IOException
+     * @throws ClientProtocolException
+     * @throws JsonParseException
+     * @throws JsonMappingException
+     */
+	public Standard getEvotextHierarchyFramework(String sourceId) throws IOException, ClientProtocolException, JsonParseException, JsonMappingException
+	{
+		Standard tmpStandardDocument = null;
+		
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		
+		// specify the host, protocol, and port
+		HttpHost targetHost = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
+		
+		logger.debug("Getting EvotextHierarchy Framework");
+		
+		// specify the get request
+		HttpGet getRequest = new HttpGet("/api/v1/framework/evotext-hierarchy/" + sourceId);
+		
+		// Add the bearer token if we have one
+		if(m_token != null)
+		{
+			getRequest.setHeader("Authorization", "Bearer " + m_token);
+		}
+
+		// Get our response from the SALT server
+		HttpResponse saltyResponse = httpClient.execute(targetHost, getRequest);
+		HttpEntity entity = saltyResponse.getEntity();
+		
+		// If we have an entity, convert it to Java objects
+		if(entity != null) 
+		{
+		    String responseString = EntityUtils.toString(entity);   
+		    
+		    logger.debug("evotext-hierarchy/{identifier} Response (" + sourceId + ")");
+		    
+		    ObjectMapper mapper = new ObjectMapper();
+	    	Standard tmpStandard = mapper.readValue(responseString,  Standard.class);
+		    
+	    	if(tmpStandard != null)
+	        {
+	    		tmpStandardDocument = tmpStandard;
+	        }
+		}
+		
+		return tmpStandardDocument;
+	}
 }

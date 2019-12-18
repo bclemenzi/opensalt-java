@@ -582,6 +582,54 @@ public class OpenSALTClient
     }
     
     /**
+     * 
+     * @param crosswalkClient - The PCG Crosswalk client that performs the crosswalks
+     * @param sourceId - The GUID that either identifies the CFDocument identifier .OR. a CFItem identifier
+     * @return A full hierarchical set of standards objects
+     * @throws Exception - catch all for exceptions
+     */
+    public Standard getFullHierarchicalStandard(CrosswalkClient crosswalkClient, String sourceId) throws Exception
+    {
+    	Standard standardDocument = null;
+    	
+        CFDocument tmpCFDocument = getCFDocument(sourceId);
+        
+        if(tmpCFDocument.getIdentifier() != null)
+        {
+        	standardDocument = crosswalkClient.getEvotextHierarchyFramework(sourceId);
+        }
+        else
+        {
+        	// Since we didn't find a framework document, check to see if the sourceId is a CFItem
+            CFItem tempCFItem = getCFItem(sourceId);
+            
+            if(tempCFItem != null)
+            {
+            	standardDocument = crosswalkClient.getEvotextHierarchyFramework(tempCFItem.getCFDocumentURI().getIdentifier());
+            	
+        		for(Standard tmpStandard : standardDocument.getStandards())
+        		{
+        			if(tmpStandard.getId().equalsIgnoreCase(sourceId))
+        			{
+        				standardDocument = tmpStandard;
+        			}
+        			else
+        			{
+        				standardDocument = checkTheChildren(sourceId, tmpStandard);
+        			}
+        			
+        			if(standardDocument != null)
+        			{
+        				break;
+        			}
+        		}
+            }
+        }
+    	
+    	return standardDocument;
+    }
+    
+    /**
      * <p>=Returns a full hierarchical representation of the standards document</p>
      * 
      * @param sourceId - The GUID that either identifies the CFDocument identifier .OR. a CFItem identifier
@@ -1479,4 +1527,32 @@ public class OpenSALTClient
         
         return semanticComparison;
     }
+	
+    /**
+     * 
+     * @param sourceId
+     * @param standardDocument
+     * @return
+     */
+	private Standard checkTheChildren(String sourceId, Standard standardDocument)
+	{
+		for(Standard tmpStandard : standardDocument.getStandards())
+		{
+			if(tmpStandard.getId().equalsIgnoreCase(sourceId))
+			{
+				standardDocument = tmpStandard;
+			}
+			else
+			{
+				standardDocument = checkTheChildren(sourceId, tmpStandard);
+			}
+			
+			if(standardDocument != null)
+			{
+				break;
+			}
+		}
+		
+		return standardDocument;
+	}
 }
