@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfbsoftware.opensalt.model.CFDocument;
+import com.nfbsoftware.opensalt.model.CFItem;
 import com.nfbsoftware.standards.model.Crosswalk;
 import com.nfbsoftware.standards.model.Standard;
 
@@ -260,6 +261,7 @@ public class CaseNetworkClientTest extends TestCase
         System.out.println("====> Finished CaseNetworkClientTest.testItemToDocumentCrosswalks");
     }
     
+    
     /**
      * 
      * @throws Exception
@@ -283,7 +285,10 @@ public class CaseNetworkClientTest extends TestCase
             //String sourceId = "3feec684-d7cc-11e8-824f-0242ac160002";
             
             // California Common Core State Standards - Mathematics - Algebra I
-            String sourceId = "7bb994e2-d7cc-11e8-824f-0242ac160002";
+            //String sourceId = "7bb994e2-d7cc-11e8-824f-0242ac160002";
+            
+            // Texas Test
+            String sourceId = "bc997e24-7f3b-5df0-a0cd-3a8ac9cf0e2e";
             
             // Tennessee Academic Standards: English Language Arts
             //String sourceId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
@@ -314,5 +319,44 @@ public class CaseNetworkClientTest extends TestCase
         }
         
         System.out.println("====> Finished CaseNetworkClientTest.testFullHierarchicalStandard");
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testGetTopLevelCFPackageItems() throws Exception
+    {
+        System.out.println("====> Starting CaseNetworkClientTest.testGetTopLevelCFPackageItems");
+        
+        try
+        {
+            OpenSALTClient openSaltClient = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+            openSaltClient.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+            
+            // Arizona
+            List<CFItem> cfItems = openSaltClient.getTopLevelCFPackageItems("c6498415-d7cb-11e8-824f-0242ac160002");
+            
+            // Texas  
+            //List<CFItem> cfItems = openSaltClient.getTopLevelCFPackageItems("bc997e24-7f3b-5df0-a0cd-3a8ac9cf0e2e");
+            
+            for(CFItem tmpCFItem : cfItems)
+            {
+                if(tmpCFItem.getCFItemType() == null)
+                {
+                    System.out.println("Identifier: " + tmpCFItem.getIdentifier() + " - " + tmpCFItem.getFullStatement());
+                }
+            }
+            
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            assertTrue(false);
+        }
+        
+        System.out.println("====> Finished CaseNetworkClientTest.testGetTopLevelCFPackageItems");
     }
 }
