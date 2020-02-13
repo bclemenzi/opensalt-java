@@ -1372,8 +1372,11 @@ public class OpenSALTClient
 	            logger.error("No PCG crosswalk data found, null pointer, for target document: " + targetDocument.getTitle() + " (" + targetDocument.getIdentifier() + ")");
 	        }
 	        
-	        // Add the overall crosswalk to the map
-	        tmpCrosswalkMap.put(fromIdKey, tmpCrosswalkList);
+	        // Add the overall crosswalk to the map if the crosswalk list isn't empty
+	        if(!tmpCrosswalkList.isEmpty())
+	        {
+	        	tmpCrosswalkMap.put(fromIdKey, tmpCrosswalkList);
+	        }
         }
         
         return tmpCrosswalkMap;
