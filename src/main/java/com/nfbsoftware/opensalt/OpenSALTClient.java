@@ -260,37 +260,44 @@ public class OpenSALTClient
     {
         CFDocument cfDocument = null;
         
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        
-        // specify the host, protocol, and port
-        HttpHost target = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
-        
-        logger.debug("Getting CFDocument " + sourceId);
-        
-        // specify the get request
-        HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFDocuments/" + sourceId);
-        
-        // Add the bearer token if we have one
-        if(m_token != null)
-        {
-            getRequest.setHeader("Authorization", "Bearer " + m_token);
-        }
+        try
+		{
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			
+			// specify the host, protocol, and port
+			HttpHost target = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
+			
+			logger.debug("Getting CFDocument " + sourceId);
+			
+			// specify the get request
+			HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFDocuments/" + sourceId);
+			
+			// Add the bearer token if we have one
+			if(m_token != null)
+			{
+			    getRequest.setHeader("Authorization", "Bearer " + m_token);
+			}
 
-        // Get our response from the SALT server
-        HttpResponse saltyResponse = httpClient.execute(target, getRequest);
-        HttpEntity entity = saltyResponse.getEntity();
-        
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
-        {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            cfDocument = mapper.readValue(responseJSON.toString(),  CFDocument.class);
-        }
+			// Get our response from the SALT server
+			HttpResponse saltyResponse = httpClient.execute(target, getRequest);
+			HttpEntity entity = saltyResponse.getEntity();
+			
+			// If we have an entity, convert it to Java objects
+			if(entity != null) 
+			{
+			    String responseString = EntityUtils.toString(entity);   
+			    
+			    JSONObject responseJSON = new JSONObject(responseString);
+			    //System.out.println(responseJSON.toString());
+			    
+			    ObjectMapper mapper = new ObjectMapper();
+			    cfDocument = mapper.readValue(responseJSON.toString(),  CFDocument.class);
+			}
+		}
+		catch (Exception e)
+		{
+			// Do nothing
+		}
         
         return cfDocument;
     }
@@ -454,37 +461,44 @@ public class OpenSALTClient
     {
         CFItem cfItem = null;
         
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        
-        // specify the host, protocol, and port
-        HttpHost target = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
-        
-        logger.debug("Getting getCFItem " + sourceId);
-        
-        // specify the get request
-        HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFItems/" + sourceId);
-        
-        // Add the bearer token if we have one
-        if(m_token != null)
-        {
-            getRequest.setHeader("Authorization", "Bearer " + m_token);
-        }
+        try
+		{
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			
+			// specify the host, protocol, and port
+			HttpHost target = new HttpHost(m_hostDomain, m_hostPort, m_hostScheme);
+			
+			logger.debug("Getting getCFItem " + sourceId);
+			
+			// specify the get request
+			HttpGet getRequest = new HttpGet("/ims/case/v1p0/CFItems/" + sourceId);
+			
+			// Add the bearer token if we have one
+			if(m_token != null)
+			{
+			    getRequest.setHeader("Authorization", "Bearer " + m_token);
+			}
 
-        // Get our response from the SALT server
-        HttpResponse saltyResponse = httpClient.execute(target, getRequest);
-        HttpEntity entity = saltyResponse.getEntity();
-        
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
-        {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            cfItem = mapper.readValue(responseJSON.toString(),  CFItem.class);
-        }
+			// Get our response from the SALT server
+			HttpResponse saltyResponse = httpClient.execute(target, getRequest);
+			HttpEntity entity = saltyResponse.getEntity();
+			
+			// If we have an entity, convert it to Java objects
+			if(entity != null) 
+			{
+			    String responseString = EntityUtils.toString(entity);   
+			    System.out.println("sourceId: " + sourceId + "    " + responseString);
+			    JSONObject responseJSON = new JSONObject(responseString);
+			    //System.out.println(responseJSON.toString());
+			    
+			    ObjectMapper mapper = new ObjectMapper();
+			    cfItem = mapper.readValue(responseJSON.toString(),  CFItem.class);
+			}
+		}
+		catch (Exception e)
+		{
+			// Do nothing
+		}
         
         return cfItem;
     }
@@ -594,7 +608,7 @@ public class OpenSALTClient
     	
         CFDocument tmpCFDocument = getCFDocument(sourceId);
         
-        if(tmpCFDocument.getIdentifier() != null)
+        if(tmpCFDocument != null)
         {
         	fullStandardDocument = crosswalkClient.getEvotextHierarchyFramework(sourceId);
         }
@@ -627,7 +641,7 @@ public class OpenSALTClient
         
         CFDocument tmpCFDocument = getCFDocument(sourceId);
         
-        if(tmpCFDocument.getIdentifier() != null)
+        if(tmpCFDocument != null)
         {
             standardDocument = new Standard();
             standardDocument.setId(tmpCFDocument.getIdentifier());
