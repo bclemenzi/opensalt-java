@@ -116,16 +116,27 @@ public class OpenSALTClient
         // Get our response from the SALT server
         HttpResponse saltyResponse = httpClient.execute(postRequest);
         HttpEntity entity = saltyResponse.getEntity();
-        
+
         // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200 
+        		|| saltyResponse.getStatusLine().getStatusCode() == 201)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            
-            m_token = StringUtils.stripToEmpty(responseJSON.getString("access_token"));
-            //System.out.println("Authenticated Bearer Token: " + m_token);
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            
+	            m_token = StringUtils.stripToEmpty(responseJSON.getString("access_token"));
+	            //System.out.println("Authenticated Bearer Token: " + m_token);
+	        }
+        }
+        else
+        {
+        	String errorMessage = "Unable to acquire an authentication token: " + saltyResponse.getStatusLine().getStatusCode() + " - " + saltyResponse.getStatusLine().getReasonPhrase();
+        	
+        	System.out.println(errorMessage);
+        	throw new Exception(errorMessage);
         }
     }
     
@@ -174,18 +185,21 @@ public class OpenSALTClient
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            Documents objectValue = mapper.readValue(responseJSON.toString(),  Documents.class);
-            
-            cfDocumentList = objectValue.getCFDocuments();
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            Documents objectValue = mapper.readValue(responseJSON.toString(),  Documents.class);
+	            
+	            cfDocumentList = objectValue.getCFDocuments();
+	        }
         }
         
         return cfDocumentList;
@@ -232,18 +246,21 @@ public class OpenSALTClient
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            Documents objectValue = mapper.readValue(responseJSON.toString(),  Documents.class);
-            
-            cfDocumentList = objectValue.getCFDocuments();
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            Documents objectValue = mapper.readValue(responseJSON.toString(),  Documents.class);
+	            
+	            cfDocumentList = objectValue.getCFDocuments();
+	        }
         }
         
         return cfDocumentList;
@@ -282,16 +299,19 @@ public class OpenSALTClient
 			HttpResponse saltyResponse = httpClient.execute(target, getRequest);
 			HttpEntity entity = saltyResponse.getEntity();
 			
-			// If we have an entity, convert it to Java objects
-			if(entity != null) 
+			if(saltyResponse.getStatusLine().getStatusCode() == 200)
 			{
-			    String responseString = EntityUtils.toString(entity);   
-			    
-			    JSONObject responseJSON = new JSONObject(responseString);
-			    //System.out.println(responseJSON.toString());
-			    
-			    ObjectMapper mapper = new ObjectMapper();
-			    cfDocument = mapper.readValue(responseJSON.toString(),  CFDocument.class);
+				// If we have an entity, convert it to Java objects
+				if(entity != null) 
+				{
+				    String responseString = EntityUtils.toString(entity);   
+				    
+				    JSONObject responseJSON = new JSONObject(responseString);
+				    //System.out.println(responseJSON.toString());
+				    
+				    ObjectMapper mapper = new ObjectMapper();
+				    cfDocument = mapper.readValue(responseJSON.toString(),  CFDocument.class);
+				}
 			}
 		}
 		catch (Exception e)
@@ -333,16 +353,19 @@ public class OpenSALTClient
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            cfPackages = mapper.readValue(responseJSON.toString(), CFPackages.class);
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            cfPackages = mapper.readValue(responseJSON.toString(), CFPackages.class);
+	        }
         }
         
         return cfPackages;
@@ -483,16 +506,19 @@ public class OpenSALTClient
 			HttpResponse saltyResponse = httpClient.execute(target, getRequest);
 			HttpEntity entity = saltyResponse.getEntity();
 			
-			// If we have an entity, convert it to Java objects
-			if(entity != null) 
+			if(saltyResponse.getStatusLine().getStatusCode() == 200)
 			{
-			    String responseString = EntityUtils.toString(entity);   
-			    System.out.println("sourceId: " + sourceId + "    " + responseString);
-			    JSONObject responseJSON = new JSONObject(responseString);
-			    //System.out.println(responseJSON.toString());
-			    
-			    ObjectMapper mapper = new ObjectMapper();
-			    cfItem = mapper.readValue(responseJSON.toString(),  CFItem.class);
+				// If we have an entity, convert it to Java objects
+				if(entity != null) 
+				{
+				    String responseString = EntityUtils.toString(entity);   
+				    System.out.println("sourceId: " + sourceId + "    " + responseString);
+				    JSONObject responseJSON = new JSONObject(responseString);
+				    //System.out.println(responseJSON.toString());
+				    
+				    ObjectMapper mapper = new ObjectMapper();
+				    cfItem = mapper.readValue(responseJSON.toString(),  CFItem.class);
+				}
 			}
 		}
 		catch (Exception e)
@@ -578,18 +604,21 @@ public class OpenSALTClient
         HttpResponse saltyResponse = httpClient.execute(target, getRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            CFItem tmpCFItem = mapper.readValue(responseJSON.toString(), CFItem.class);
-            
-            cfAssociations = tmpCFItem.getCFAssociations();
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            CFItem tmpCFItem = mapper.readValue(responseJSON.toString(), CFItem.class);
+	            
+	            cfAssociations = tmpCFItem.getCFAssociations();
+	        }
         }
         
         return cfAssociations;

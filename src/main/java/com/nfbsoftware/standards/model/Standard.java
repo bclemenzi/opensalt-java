@@ -105,7 +105,7 @@ public class Standard implements Serializable
     {
         m_listEnumeration = listEnumeration;
     }
-
+    
     public String getFullStatement()
     {
         return m_fullStatement;

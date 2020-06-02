@@ -288,7 +288,7 @@ public class CaseNetworkClientTest extends TestCase
             //String sourceId = "7bb994e2-d7cc-11e8-824f-0242ac160002";
             
             // Texas Test
-            String sourceId = "bc997e24-7f3b-5df0-a0cd-3a8ac9cf0e2e";
+            String sourceId = "71ce52be-d7cc-11e8-824f-0242ac160002";
             
             // Tennessee Academic Standards: English Language Arts
             //String sourceId = "c607fa0c-d7cb-11e8-824f-0242ac160002";
@@ -335,10 +335,13 @@ public class CaseNetworkClientTest extends TestCase
             openSaltClient.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
             
             // Arizona
-            List<CFItem> cfItems = openSaltClient.getTopLevelCFPackageItems("c6498415-d7cb-11e8-824f-0242ac160002");
+            //List<CFItem> cfItems = openSaltClient.getTopLevelCFPackageItems("c6498415-d7cb-11e8-824f-0242ac160002");
             
             // Texas  
             //List<CFItem> cfItems = openSaltClient.getTopLevelCFPackageItems("bc997e24-7f3b-5df0-a0cd-3a8ac9cf0e2e");
+            
+            // TN  
+            List<CFItem> cfItems = openSaltClient.getTopLevelCFPackageItems("33a85513-4cab-402a-a7be-f3aeee56eebc");
             
             for(CFItem tmpCFItem : cfItems)
             {

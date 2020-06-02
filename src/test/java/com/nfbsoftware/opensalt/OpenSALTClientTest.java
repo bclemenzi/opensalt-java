@@ -210,7 +210,7 @@ public class OpenSALTClientTest extends TestCase
         {
             OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
             
-            List<CFItem> cfItems = client.getTopLevelCFPackageItems("c5fb0812-d7cb-11e8-824f-0242ac160002");
+            List<CFItem> cfItems = client.getTopLevelCFPackageItems("c607fa0c-d7cb-11e8-824f-0242ac160002");
             
             for(CFItem tmpCFItem : cfItems)
             {

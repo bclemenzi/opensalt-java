@@ -103,15 +103,27 @@ public class CrosswalkClient
         HttpResponse saltyResponse = httpClient.execute(postRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        System.out.println(saltyResponse.getStatusLine().getStatusCode());
+        
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            
-            m_token = StringUtils.stripToEmpty(responseJSON.getString("access_token"));
-            //System.out.println("Authenticated Bearer Token: " + m_token);
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            
+	            m_token = StringUtils.stripToEmpty(responseJSON.getString("access_token"));
+	            //System.out.println("Authenticated Bearer Token: " + m_token);
+	        }
+        }
+        else
+        {
+        	String errorMessage = "Unable to acquire an authentication token for crosswalk: " + saltyResponse.getStatusLine().getStatusCode() + " - " + saltyResponse.getStatusLine().getReasonPhrase();
+        	
+        	System.out.println(errorMessage);
+        	throw new Exception(errorMessage);
         }
     }
     
@@ -162,17 +174,20 @@ public class CrosswalkClient
         HttpResponse saltyResponse = httpClient.execute(targetHost, getRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            logger.debug("Crosswalk/by-identifier Response (" + identifier + " to " + target + "): " + responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            tmpPCGCrosswalk = mapper.readValue(responseJSON.toString(),  PCGCrosswalk.class);
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            logger.debug("Crosswalk/by-identifier Response (" + identifier + " to " + target + "): " + responseJSON.toString());
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            tmpPCGCrosswalk = mapper.readValue(responseJSON.toString(),  PCGCrosswalk.class);
+	        }
         }
         
         return tmpPCGCrosswalk;
@@ -211,17 +226,20 @@ public class CrosswalkClient
         HttpResponse saltyResponse = httpClient.execute(targetHost, getRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            logger.debug("Crosswalk/by-hcs Response (" + source + " -  " + hcs + " - " + target + "): " + responseJSON.toString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            tmpPCGCrosswalk = mapper.readValue(responseJSON.toString(),  PCGCrosswalk.class);
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            logger.debug("Crosswalk/by-hcs Response (" + source + " -  " + hcs + " - " + target + "): " + responseJSON.toString());
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            tmpPCGCrosswalk = mapper.readValue(responseJSON.toString(),  PCGCrosswalk.class);
+	        }
         }
         
         return tmpPCGCrosswalk;
@@ -271,27 +289,30 @@ public class CrosswalkClient
         HttpResponse saltyResponse = httpClient.execute(targetHost, postRequest);
         HttpEntity entity = saltyResponse.getEntity();
         
-        // If we have an entity, convert it to Java objects
-        if(entity != null) 
+        if(saltyResponse.getStatusLine().getStatusCode() == 200)
         {
-            String responseString = EntityUtils.toString(entity);   
-            
-            JSONObject responseJSON = new JSONObject(responseString);
-            //System.out.println(responseJSON.toString());
-            logger.debug("Crosswalk/to-framework Response (" + target + "): " + responseJSON.toString());
-            
-            Set<String> identifierKeys = responseJSON.keySet();
-            
-            ObjectMapper mapper = new ObjectMapper();
-            for(String key : identifierKeys)
-            {
-            	PCGCrosswalk tmpPCGCrosswalk = mapper.readValue(responseJSON.get(key).toString(),  PCGCrosswalk.class);
-            
-            	if(tmpPCGCrosswalk != null)
-                {
-            		tmpPCGCrosswalks.put(key, tmpPCGCrosswalk);
-                }
-            }
+	        // If we have an entity, convert it to Java objects
+	        if(entity != null) 
+	        {
+	            String responseString = EntityUtils.toString(entity);   
+	            
+	            JSONObject responseJSON = new JSONObject(responseString);
+	            //System.out.println(responseJSON.toString());
+	            logger.debug("Crosswalk/to-framework Response (" + target + "): " + responseJSON.toString());
+	            
+	            Set<String> identifierKeys = responseJSON.keySet();
+	            
+	            ObjectMapper mapper = new ObjectMapper();
+	            for(String key : identifierKeys)
+	            {
+	            	PCGCrosswalk tmpPCGCrosswalk = mapper.readValue(responseJSON.get(key).toString(),  PCGCrosswalk.class);
+	            
+	            	if(tmpPCGCrosswalk != null)
+	                {
+	            		tmpPCGCrosswalks.put(key, tmpPCGCrosswalk);
+	                }
+	            }
+	        }
         }
         
         return tmpPCGCrosswalks;
@@ -330,20 +351,23 @@ public class CrosswalkClient
 		HttpResponse saltyResponse = httpClient.execute(targetHost, getRequest);
 		HttpEntity entity = saltyResponse.getEntity();
 		
-		// If we have an entity, convert it to Java objects
-		if(entity != null) 
+		if(saltyResponse.getStatusLine().getStatusCode() == 200)
 		{
-		    String responseString = EntityUtils.toString(entity);   
-		    
-		    logger.debug("evotext-hierarchy/{identifier} Response (" + sourceId + ")");
-		    
-		    ObjectMapper mapper = new ObjectMapper();
-	    	Standard tmpStandard = mapper.readValue(responseString,  Standard.class);
-		    
-	    	if(tmpStandard != null)
-	        {
-	    		tmpStandardDocument = tmpStandard;
-	        }
+			// If we have an entity, convert it to Java objects
+			if(entity != null) 
+			{
+			    String responseString = EntityUtils.toString(entity);   
+			    
+			    logger.debug("evotext-hierarchy/{identifier} Response (" + sourceId + ")");
+			    
+			    ObjectMapper mapper = new ObjectMapper();
+		    	Standard tmpStandard = mapper.readValue(responseString,  Standard.class);
+			    
+		    	if(tmpStandard != null)
+		        {
+		    		tmpStandardDocument = tmpStandard;
+		        }
+			}
 		}
 		
 		return tmpStandardDocument;
