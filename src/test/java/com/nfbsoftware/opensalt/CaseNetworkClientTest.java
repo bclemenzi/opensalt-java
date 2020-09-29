@@ -288,7 +288,7 @@ public class CaseNetworkClientTest extends TestCase
             //String sourceId = "7bb994e2-d7cc-11e8-824f-0242ac160002";
             
             // Texas Test
-            String sourceId = "71ce52be-d7cc-11e8-824f-0242ac160002";
+            String sourceId = "c627f1db-d7cb-11e8-824f-0242ac160002";
             
             // Tennessee Academic Standards: English Language Arts
             //String sourceId = "c607fa0c-d7cb-11e8-824f-0242ac160002";

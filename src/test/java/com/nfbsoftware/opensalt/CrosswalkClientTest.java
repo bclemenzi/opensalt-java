@@ -24,8 +24,8 @@ public class CrosswalkClientTest extends TestCase
     private String HOST_SCHEME = "https"; 
     
     private String AUTHENTICATION_URL = "https://api-stg.opensalt.net/oauth/token";
-    private String CLIENT_ID = "your client id";
-    private String CLIENT_SECRET = "your client secret";
+    private String CLIENT_ID = "evotext.com";
+    private String CLIENT_SECRET = "9852vRckTB51WzF3C6HVMYiqh9yfGH0uB6M9UFQS-cf1";
     private String GRANT_TYPE = "client_credentials";
     private String SCOPE = "";
     

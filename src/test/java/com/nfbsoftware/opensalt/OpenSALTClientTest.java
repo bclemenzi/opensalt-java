@@ -210,7 +210,7 @@ public class OpenSALTClientTest extends TestCase
         {
             OpenSALTClient client = new OpenSALTClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
             
-            List<CFItem> cfItems = client.getTopLevelCFPackageItems("c607fa0c-d7cb-11e8-824f-0242ac160002");
+            List<CFItem> cfItems = client.getTopLevelCFPackageItems("c6489520-d7cb-11e8-824f-0242ac160002");
             
             for(CFItem tmpCFItem : cfItems)
             {
@@ -350,7 +350,7 @@ public class OpenSALTClientTest extends TestCase
             System.out.println((new Date()).getTime());
             
             //Standard fullStandardsDocument = client.getFullHierarchicalStandard("4d6e94e4-f280-11e8-9cff-0242ac140002");
-            Standard fullStandardsDocument = null;  //client.getFullHierarchicalStandard("4d6e94e4-f280-11e8-9cff-0242ac140002");
+            Standard fullStandardsDocument = client.getFullHierarchicalStandard("c627f1db-d7cb-11e8-824f-0242ac160002");
             
             if(fullStandardsDocument != null)
             {

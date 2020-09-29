@@ -1568,22 +1568,28 @@ public class OpenSALTClient
      */
 	private Standard checkTheChildren(String sourceId, Standard standardDocument, Standard fullStandardDocument)
 	{
-		for(Standard tmpStandard : standardDocument.getStandards())
+		if(standardDocument != null)
 		{
-			//System.out.println(tmpStandard.getHumanCodingScheme() + " - " + tmpStandard.getFullStatement());
-			
-			if(tmpStandard.getId().equalsIgnoreCase(sourceId))
+			if(standardDocument.getStandards() != null)
 			{
-				fullStandardDocument = tmpStandard;
-			}
-			else
-			{
-				fullStandardDocument = checkTheChildren(sourceId, tmpStandard, fullStandardDocument);
-			}
-			
-			if(fullStandardDocument != null)
-			{
-				break;
+				for(Standard tmpStandard : standardDocument.getStandards())
+				{
+					//System.out.println(tmpStandard.getHumanCodingScheme() + " - " + tmpStandard.getFullStatement());
+					
+					if(tmpStandard.getId().equalsIgnoreCase(sourceId))
+					{
+						fullStandardDocument = tmpStandard;
+					}
+					else
+					{
+						fullStandardDocument = checkTheChildren(sourceId, tmpStandard, fullStandardDocument);
+					}
+					
+					if(fullStandardDocument != null)
+					{
+						break;
+					}
+				}
 			}
 		}
 		
