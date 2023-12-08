@@ -1,2 +1,7 @@
 /target/
 /local-keys-for-testing.txt
+.DS_Store
+/**/.DS_Store
+.settings/org.eclipse.*
+/hs_err_*
+/volume
