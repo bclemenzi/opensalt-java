@@ -28,7 +28,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.DiffException;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 import com.nfbsoftware.opensalt.model.CFAssociation;
