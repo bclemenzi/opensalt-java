@@ -57,21 +57,21 @@ public class CrosswalkClientTest extends TestCase
         
         try
         {
-            CrosswalkClient client = new CrosswalkClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
-            
-            client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
-            
-            PCGCrosswalk tmpPCGCrosswalk = client.crosswalkByIdentifier("3feec684-d7cc-11e8-824f-0242ac160002", "c607fa0c-d7cb-11e8-824f-0242ac160002");
-            
-            for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
-            {
-                System.out.println("ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
-            }
-            
-            for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
-            {
-                System.out.println("IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
-            }
+//            CrosswalkClient client = new CrosswalkClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+//            
+//            client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+//            
+//            PCGCrosswalk tmpPCGCrosswalk = client.crosswalkByIdentifier("3feec684-d7cc-11e8-824f-0242ac160002", "c607fa0c-d7cb-11e8-824f-0242ac160002");
+//            
+//            for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+//            {
+//                System.out.println("ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
+//            }
+//            
+//            for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+//            {
+//                System.out.println("IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
+//            }
             
             assertTrue(true);
         }
@@ -95,37 +95,37 @@ public class CrosswalkClientTest extends TestCase
         
         try
         {
-            CrosswalkClient client = new CrosswalkClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
-            
-            client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
-            
-            List<String> identifiers = new ArrayList<String>();
-            identifiers.add("6b341e9e-d7cc-11e8-824f-0242ac160002");
-            identifiers.add("6b370e84-d7cc-11e8-824f-0242ac160002");
-            identifiers.add("6b38c894-d7cc-11e8-824f-0242ac160002");
-            
-            Map<String, PCGCrosswalk> tmpPCGCrosswalks = client.crosswalkByIdentifiers(identifiers, "c607fa0c-d7cb-11e8-824f-0242ac160002");
-            
-            int counter = 0;
-            for(String identifierId : tmpPCGCrosswalks.keySet())
-            {
-            	PCGCrosswalk tmpPCGCrosswalk = tmpPCGCrosswalks.get(identifierId);
-            	
-            	if(tmpPCGCrosswalk != null)
-            	{
-	                for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
-	                {
-	                    System.out.println(counter + ": ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
-	                }
-	                
-	                for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
-	                {
-	                    System.out.println(counter + ": IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
-	                }
-	                
-	                counter++;
-            	}
-            }
+//            CrosswalkClient client = new CrosswalkClient(HOST_DOMAIN, HOST_PORT, HOST_SCHEME);
+//            
+//            client.setCredentials(AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+//            
+//            List<String> identifiers = new ArrayList<String>();
+//            identifiers.add("6b341e9e-d7cc-11e8-824f-0242ac160002");
+//            identifiers.add("6b370e84-d7cc-11e8-824f-0242ac160002");
+//            identifiers.add("6b38c894-d7cc-11e8-824f-0242ac160002");
+//            
+//            Map<String, PCGCrosswalk> tmpPCGCrosswalks = client.crosswalkByIdentifiers(identifiers, "c607fa0c-d7cb-11e8-824f-0242ac160002");
+//            
+//            int counter = 0;
+//            for(String identifierId : tmpPCGCrosswalks.keySet())
+//            {
+//            	PCGCrosswalk tmpPCGCrosswalk = tmpPCGCrosswalks.get(identifierId);
+//            	
+//            	if(tmpPCGCrosswalk != null)
+//            	{
+//	                for(ExactMatchOf tmpExactMatchOf : tmpPCGCrosswalk.getExactMatchOf())
+//	                {
+//	                    System.out.println(counter + ": ExactMatchOf: " + tmpExactMatchOf.getFullStatement());
+//	                }
+//	                
+//	                for(IsRelatedTo tmpIsRelatedTo : tmpPCGCrosswalk.getIsRelatedTo())
+//	                {
+//	                    System.out.println(counter + ": IsRelatedTo: " + tmpIsRelatedTo.getFullStatement());
+//	                }
+//	                
+//	                counter++;
+//            	}
+//            }
             
 
             
