@@ -22,6 +22,7 @@
   	<properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<java.version>18</java.version>
+    	<gpg.keyname>02010707</gpg.keyname>
   	</properties>
   	
 	<build>
@@ -98,24 +99,22 @@
           			</execution>
         		</executions>
       		</plugin>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.13</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>sonatype</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 	
 	<scm>
-		<url>https://github.com/bclemenzi/simple-ab</url>
-		<connection>scm:git:git://github.com/bclemenzi/simple-ab.git</connection>
-		<developerConnection>scm:git:git@github.com:bclemenzi/simple-ab.git</developerConnection>
+		<url>https://github.com/bclemenzi/opensalt-java</url>
+		<connection>scm:git:git://github.com/bclemenzi/opensalt-java.git</connection>
+		<developerConnection>scm:git:git@github.com:bclemenzi/opensalt-java.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -127,16 +126,16 @@
 		</developer>
 	</developers>
 	
-	<distributionManagement>
-    	<repository>
-      		<id>oss.sonatype.org</id>
-      		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    	</repository>
-    	<snapshotRepository>
-      		<id>oss.sonatype.org</id>
-      		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    	</snapshotRepository>
-	</distributionManagement>
+    <distributionManagement>
+      <snapshotRepository>
+        <id>ossrh</id>
+        <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+      </snapshotRepository>
+      <repository>
+        <id>ossrh</id>
+        <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+    </distributionManagement>
 
   	<dependencies>
 		<dependency>
